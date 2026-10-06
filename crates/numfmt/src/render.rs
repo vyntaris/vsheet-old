@@ -1,7 +1,7 @@
 //! Rendering a value with a parsed section.
 
-use sheetcraft_core::DateSystem;
-use sheetcraft_core::date::{MONTHS, WEEKDAYS, datetime_from_serial};
+use vsheet_core::DateSystem;
+use vsheet_core::date::{MONTHS, WEEKDAYS, datetime_from_serial};
 
 use crate::decimal::{decimal_digits, fixed, fixed_from_digits, format_general_fit};
 use crate::parse::{DatePart, Section, Tok};

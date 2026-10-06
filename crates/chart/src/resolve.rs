@@ -1,9 +1,9 @@
 //! Pulls chart data (names, categories, values, formats, colours) out of a workbook.
 
-use sheetcraft_calc::evaluate;
-use sheetcraft_core::{CellRef, RangeRef, Value, number_to_text};
-use sheetcraft_model::{Chart, ChartKind, Theme, Workbook, style::apply_tint};
-use sheetcraft_numfmt::{NumberFormat, format_value};
+use vsheet_calc::evaluate;
+use vsheet_core::{CellRef, RangeRef, Value, number_to_text};
+use vsheet_model::{Chart, ChartKind, Theme, Workbook, style::apply_tint};
+use vsheet_numfmt::{NumberFormat, format_value};
 
 use crate::{ChartData, Rgba, SeriesData};
 

@@ -2,8 +2,8 @@
 
 use std::cmp::Ordering;
 
-use sheetcraft_core::parse::parse_number_text;
-use sheetcraft_core::{CellError, Value, compare_text};
+use vsheet_core::parse::parse_number_text;
+use vsheet_core::{CellError, Value, compare_text};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Op {

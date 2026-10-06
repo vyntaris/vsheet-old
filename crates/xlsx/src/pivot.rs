@@ -14,10 +14,10 @@
 use std::collections::HashMap;
 use std::fmt::Write as _;
 
-use sheetcraft_core::date::datetime_from_serial;
-use sheetcraft_core::{CellRef, DateSystem, RangeRef, Value, number_to_text};
-use sheetcraft_formula::quote_sheet;
-use sheetcraft_model::{PivotDateGroup, PivotField, PivotFilter, PivotFunc, PivotLayout, PivotShowAs, PivotSort, PivotTable, PivotValue, Workbook};
+use vsheet_core::date::datetime_from_serial;
+use vsheet_core::{CellRef, DateSystem, RangeRef, Value, number_to_text};
+use vsheet_formula::quote_sheet;
+use vsheet_model::{PivotDateGroup, PivotField, PivotFilter, PivotFunc, PivotLayout, PivotShowAs, PivotSort, PivotTable, PivotValue, Workbook};
 
 use crate::IoError;
 use crate::read::Ctx;
@@ -654,7 +654,7 @@ fn cache_xml(c: &Cache, records_rid: Option<&str>, sys: DateSystem) -> String {
         }
         _ => s.push_str(" saveData=\"0\""),
     }
-    s.push_str(" refreshOnLoad=\"1\" refreshedBy=\"SheetCraft\" createdVersion=\"6\" refreshedVersion=\"6\" minRefreshableVersion=\"3\">");
+    s.push_str(" refreshOnLoad=\"1\" refreshedBy=\"VSheet\" createdVersion=\"6\" refreshedVersion=\"6\" minRefreshableVersion=\"3\">");
     let _ = write!(s, "<cacheSource type=\"worksheet\">{}</cacheSource>", c.source_xml);
     let _ = write!(s, "<cacheFields count=\"{}\">", c.fields.len());
     for f in &c.fields {

@@ -1,6 +1,6 @@
 //! In-cell sparklines.
 
-use sheetcraft_model::SparklineKind;
+use vsheet_model::SparklineKind;
 
 use crate::render::{DOWN, finalize};
 use crate::resolve::MAX_POINTS;

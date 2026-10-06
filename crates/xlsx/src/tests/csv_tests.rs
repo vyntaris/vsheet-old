@@ -1,5 +1,5 @@
-use sheetcraft_core::{CellRef, DateSystem, Value};
-use sheetcraft_model::{Sheet, Workbook};
+use vsheet_core::{CellRef, DateSystem, Value};
+use vsheet_model::{Sheet, Workbook};
 
 use crate::csv::{decode_text, sniff_delimiter};
 use crate::{CsvOptions, Format, read_csv, sniff, write_csv};
@@ -88,7 +88,7 @@ fn writing() {
     s.set_value(CellRef::new(2, 1), Value::Number(0.1));
     s.set_value(CellRef::new(2, 2), Value::Bool(false));
     s.set_value(CellRef::new(3, 3), Value::text("x\ny"));
-    s.set_value(CellRef::new(3, 1), Value::Error(sheetcraft_core::CellError::Div0));
+    s.set_value(CellRef::new(3, 1), Value::Error(vsheet_core::CellError::Div0));
     wb.sheets = vec![std::sync::Arc::new(s)];
     let out = String::from_utf8(write_csv(wb.sheet(0).unwrap(), &wb, b',')).unwrap();
     assert_eq!(out, "\"a,b\",\"q\"\"t\",\r\n0.1,FALSE,\r\n#DIV/0!,,\"x\ny\"\r\n");

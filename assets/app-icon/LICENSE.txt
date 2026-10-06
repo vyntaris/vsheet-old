@@ -1,8 +1,8 @@
-SheetCraft app icon (sheetcraft.svg and every file derived from it in this directory:
-sheetcraft-1024.png, sheetcraft-macos-512.png, sheetcraft.icns, sheetcraft.ico, hicolor/).
+VSheet app icon (vsheet.svg and every file derived from it in this directory:
+vsheet-1024.png, vsheet-macos-512.png, vsheet.icns, vsheet.ico, hicolor/).
 
-PLACEHOLDER artwork: original work written for this project by SheetCraft contributors (simple
-hand-written SVG geometry). No third-party material. Licensed like the rest of SheetCraft, under
+PLACEHOLDER artwork: original work written for this project by VSheet contributors (simple
+hand-written SVG geometry). No third-party material. Licensed like the rest of VSheet, under
 either of
 
   * Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0)

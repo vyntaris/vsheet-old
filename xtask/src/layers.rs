@@ -24,7 +24,7 @@ impl Class {
 }
 
 /// The layering table (AGENTS.md "Layering", plan/architecture.md). Names are package names
-/// without the `sheetcraft-` prefix.
+/// without the `vsheet-` prefix.
 pub const TABLE: &[(&str, Class)] = &[
     ("core", Class::Layer(0)),
     ("numfmt", Class::Layer(0)),
@@ -39,7 +39,7 @@ pub const TABLE: &[(&str, Class)] = &[
     ("ui-egui", Class::Layer(6)),
     ("mcp", Class::Layer(6)),
     // L7 apps (exempt) and tooling (unchecked)
-    ("sheetcraft", Class::Layer(7)),
+    ("vsheet", Class::Layer(7)),
     ("cli", Class::Layer(7)),
     ("web", Class::Layer(7)),
     ("xtask", Class::Exempt),
@@ -69,7 +69,7 @@ pub const UI_CRATES: &[&str] = &["egui*", "eframe", "winit", "rfd", "wgpu*"];
 pub const UI_MIN_LAYER: u8 = 6;
 
 pub fn short_name(pkg: &str) -> &str {
-    pkg.strip_prefix("sheetcraft-").unwrap_or(pkg)
+    pkg.strip_prefix("vsheet-").unwrap_or(pkg)
 }
 
 pub fn classify(pkg: &str) -> Option<Class> {
@@ -224,85 +224,85 @@ mod tests {
     #[test]
     fn clean_downward_graph_passes() {
         let g = [
-            c("sheetcraft-core", &[("serde", Normal, false)]),
-            c("sheetcraft-numfmt", &[("sheetcraft-core", Normal, true)]),
-            c("sheetcraft-formula", &[("sheetcraft-core", Normal, true)]),
-            c("sheetcraft-functions", &[("sheetcraft-core", Normal, true), ("sheetcraft-formula", Normal, true)]),
-            c("sheetcraft-model", &[("sheetcraft-formula", Normal, true)]),
-            c("sheetcraft-calc", &[("sheetcraft-model", Normal, true), ("sheetcraft-functions", Normal, true), ("sheetcraft-numfmt", Normal, true)]),
-            c("sheetcraft-xlsx", &[("sheetcraft-core", Normal, true), ("sheetcraft-formula", Normal, true), ("sheetcraft-model", Normal, true)]),
-            c("sheetcraft-chart", &[("sheetcraft-model", Normal, true)]),
-            c("sheetcraft-engine", &[("sheetcraft-calc", Normal, true), ("sheetcraft-xlsx", Normal, true), ("sheetcraft-chart", Normal, true)]),
-            c("sheetcraft-ui-egui", &[("sheetcraft-engine", Normal, true), ("egui", Normal, false), ("wgpu", Normal, false)]),
-            c("sheetcraft-cli", &[("sheetcraft-ui-egui", Normal, true), ("sheetcraft-mcp", Normal, true)]),
+            c("vsheet-core", &[("serde", Normal, false)]),
+            c("vsheet-numfmt", &[("vsheet-core", Normal, true)]),
+            c("vsheet-formula", &[("vsheet-core", Normal, true)]),
+            c("vsheet-functions", &[("vsheet-core", Normal, true), ("vsheet-formula", Normal, true)]),
+            c("vsheet-model", &[("vsheet-formula", Normal, true)]),
+            c("vsheet-calc", &[("vsheet-model", Normal, true), ("vsheet-functions", Normal, true), ("vsheet-numfmt", Normal, true)]),
+            c("vsheet-xlsx", &[("vsheet-core", Normal, true), ("vsheet-formula", Normal, true), ("vsheet-model", Normal, true)]),
+            c("vsheet-chart", &[("vsheet-model", Normal, true)]),
+            c("vsheet-engine", &[("vsheet-calc", Normal, true), ("vsheet-xlsx", Normal, true), ("vsheet-chart", Normal, true)]),
+            c("vsheet-ui-egui", &[("vsheet-engine", Normal, true), ("egui", Normal, false), ("wgpu", Normal, false)]),
+            c("vsheet-cli", &[("vsheet-ui-egui", Normal, true), ("vsheet-mcp", Normal, true)]),
         ];
         assert!(check(&g).is_empty(), "{:?}", check(&g));
     }
 
     #[test]
     fn upward_dependency_flagged() {
-        let v = check(&[c("sheetcraft-formula", &[("sheetcraft-engine", Normal, true)])]);
+        let v = check(&[c("vsheet-formula", &[("vsheet-engine", Normal, true)])]);
         assert!(matches!(v[..], [Violation::Upward { from: 1, to: 5, .. }]));
     }
 
     #[test]
     fn sideways_dependency_flagged() {
-        let v = check(&[c("sheetcraft-xlsx", &[("sheetcraft-calc", Normal, true)])]);
+        let v = check(&[c("vsheet-xlsx", &[("vsheet-calc", Normal, true)])]);
         assert!(v.iter().any(|x| matches!(x, Violation::Upward { from: 2, to: 2, .. })), "{v:?}");
-        let v = check(&[c("sheetcraft-ui-egui", &[("sheetcraft-mcp", Normal, true)])]);
+        let v = check(&[c("vsheet-ui-egui", &[("vsheet-mcp", Normal, true)])]);
         assert!(matches!(v[..], [Violation::Upward { from: 6, to: 6, .. }]));
     }
 
     #[test]
     fn intra_layer_chains_allowed_one_way() {
-        assert!(check(&[c("sheetcraft-numfmt", &[("sheetcraft-core", Normal, true)])]).is_empty());
-        let v = check(&[c("sheetcraft-core", &[("sheetcraft-numfmt", Normal, true)])]);
+        assert!(check(&[c("vsheet-numfmt", &[("vsheet-core", Normal, true)])]).is_empty());
+        let v = check(&[c("vsheet-core", &[("vsheet-numfmt", Normal, true)])]);
         assert!(matches!(v[..], [Violation::Upward { from: 0, to: 0, .. }]));
-        assert!(check(&[c("sheetcraft-calc", &[("sheetcraft-model", Normal, true)])]).is_empty());
-        assert!(!check(&[c("sheetcraft-model", &[("sheetcraft-calc", Normal, true)])]).is_empty());
-        assert!(!check(&[c("sheetcraft-calc", &[("sheetcraft-xlsx", Normal, true)])]).is_empty());
+        assert!(check(&[c("vsheet-calc", &[("vsheet-model", Normal, true)])]).is_empty());
+        assert!(!check(&[c("vsheet-model", &[("vsheet-calc", Normal, true)])]).is_empty());
+        assert!(!check(&[c("vsheet-calc", &[("vsheet-xlsx", Normal, true)])]).is_empty());
     }
 
     #[test]
     fn format_crate_limited_to_core_formula_model() {
-        let v = check(&[c("sheetcraft-xlsx", &[("sheetcraft-numfmt", Normal, true)])]);
-        assert!(matches!(&v[..], [Violation::FormatDep { dep, .. }] if dep == "sheetcraft-numfmt"), "{v:?}");
+        let v = check(&[c("vsheet-xlsx", &[("vsheet-numfmt", Normal, true)])]);
+        assert!(matches!(&v[..], [Violation::FormatDep { dep, .. }] if dep == "vsheet-numfmt"), "{v:?}");
         // Dev-dependencies (round-trip tests through the calculator, say) are allowed if lower.
-        assert!(check(&[c("sheetcraft-xlsx", &[("sheetcraft-numfmt", Dev, true)])]).is_empty());
+        assert!(check(&[c("vsheet-xlsx", &[("vsheet-numfmt", Dev, true)])]).is_empty());
     }
 
     #[test]
     fn self_dev_dependency_ignored() {
-        assert!(check(&[c("sheetcraft-model", &[("sheetcraft-model", Dev, true)])]).is_empty());
+        assert!(check(&[c("vsheet-model", &[("vsheet-model", Dev, true)])]).is_empty());
     }
 
     #[test]
     fn upward_dev_dependency_flagged() {
-        let v = check(&[c("sheetcraft-core", &[("sheetcraft-model", Dev, true)])]);
+        let v = check(&[c("vsheet-core", &[("vsheet-model", Dev, true)])]);
         assert!(matches!(v[..], [Violation::Upward { kind: Dev, .. }]));
     }
 
     #[test]
     fn ui_crates_below_l6_flagged() {
         for dep in ["egui", "eframe", "winit", "egui_kittest", "egui_extras", "rfd", "wgpu", "wgpu-core"] {
-            let v = check(&[c("sheetcraft-engine", &[(dep, Normal, false)])]);
+            let v = check(&[c("vsheet-engine", &[(dep, Normal, false)])]);
             assert!(matches!(v[..], [Violation::UiBelowL6 { layer: 5, .. }]), "{dep}");
         }
-        assert!(check(&[c("sheetcraft-engine", &[("serde", Normal, false)])]).is_empty());
-        assert!(check(&[c("sheetcraft-mcp", &[("winit", Normal, false)])]).is_empty());
+        assert!(check(&[c("vsheet-engine", &[("serde", Normal, false)])]).is_empty());
+        assert!(check(&[c("vsheet-mcp", &[("winit", Normal, false)])]).is_empty());
     }
 
     #[test]
     fn unregistered_crate_is_error() {
-        let v = check(&[c("sheetcraft-mystery", &[])]);
-        assert!(matches!(&v[..], [Violation::Unregistered { krate }] if krate == "sheetcraft-mystery"));
+        let v = check(&[c("vsheet-mystery", &[])]);
+        assert!(matches!(&v[..], [Violation::Unregistered { krate }] if krate == "vsheet-mystery"));
         assert!(v[0].to_string().contains("register"));
     }
 
     #[test]
     fn apps_and_xtask_exempt() {
-        for app in ["sheetcraft", "sheetcraft-cli", "sheetcraft-web", "xtask"] {
-            assert!(check(&[c(app, &[("egui", Normal, false), ("sheetcraft-ui-egui", Normal, true)])]).is_empty());
+        for app in ["vsheet", "vsheet-cli", "vsheet-web", "xtask"] {
+            assert!(check(&[c(app, &[("egui", Normal, false), ("vsheet-ui-egui", Normal, true)])]).is_empty());
         }
     }
 
@@ -310,17 +310,17 @@ mod tests {
     fn metadata_parsing() {
         let meta: Value = serde_json::from_str(
             r#"{"packages":[
-                {"name":"sheetcraft-model","dependencies":[
-                    {"name":"sheetcraft-core","kind":null,"path":"/x/crates/core"},
+                {"name":"vsheet-model","dependencies":[
+                    {"name":"vsheet-core","kind":null,"path":"/x/crates/core"},
                     {"name":"serde","kind":null},
                     {"name":"proptest","kind":"dev"}]},
-                {"name":"sheetcraft-core","dependencies":[]}
+                {"name":"vsheet-core","dependencies":[]}
             ]}"#,
         )
         .unwrap();
         let g = from_metadata(&meta).unwrap();
         assert_eq!(g.len(), 2);
-        let model = g.iter().find(|c| c.name == "sheetcraft-model").unwrap();
+        let model = g.iter().find(|c| c.name == "vsheet-model").unwrap();
         assert!(model.deps[0].workspace && !model.deps[1].workspace);
         assert_eq!(model.deps[2].kind, Dev);
         assert!(check(&g).is_empty());

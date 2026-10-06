@@ -1,7 +1,7 @@
 //! Review tab: protection, spelling (basic), workbook statistics.
 
+use vsheet_model::{SheetProtection, password_hash};
 use serde_json::{Value as Json, json};
-use sheetcraft_model::{SheetProtection, password_hash};
 
 use super::*;
 

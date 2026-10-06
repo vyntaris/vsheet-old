@@ -1,13 +1,13 @@
-# SheetCraft app icon (PLACEHOLDER)
+# VSheet app icon (PLACEHOLDER)
 
 **This icon is temporary.** Every Crafting App's icon is an engraved creature portrait that the
-product owner makes (craftrules `standards/icon-design.md`); SheetCraft's hasn't been made yet.
+product owner makes (craftrules `standards/icon-design.md`); VSheet's hasn't been made yet.
 Until it is, this placeholder stands in: a simple ledger page with a header row, a row-number
 column, a selected cell with its fill handle and a double rule under a total, on a full-bleed
-SheetCraft-green tile. It is original geometry written by hand for this repository, deliberately
+VSheet-green tile. It is original geometry written by hand for this repository, deliberately
 not modelled on any vendor's spreadsheet logo (no letters, no "X", no overlapping panels).
 
-When the owner's art arrives, replace `sheetcraft.svg`, run `packaging/icons.sh`, update this
+When the owner's art arrives, replace `vsheet.svg`, run `packaging/icons.sh`, update this
 README (provenance, creature) and the rows in `ATTRIBUTION.md`, and drop the word placeholder.
 
 ## Palette
@@ -18,35 +18,35 @@ Exactly three colours:
 |---|---|---|
 | Ink | `#0b0b0c` | Line work and contour |
 | Paper | `#efe9dc` | The page |
-| SheetCraft green (app colour, **proposed**) | `#1f9d55` | The full-bleed field and the header cells |
+| VSheet green (app colour, **proposed**) | `#1f9d55` | The full-bleed field and the header cells |
 
-The app colour is a proposal pending the owner's approval: SheetCraft green `#1f9d55`, with ink
+The app colour is a proposal pending the owner's approval: VSheet green `#1f9d55`, with ink
 (darker) variant `#147a40` for text and accents on light backgrounds. It differs from
 DesignCraft's `#7bb51c`.
 
 ## Geometry
 
 A 512 × 512 viewBox, clipped to a rounded square with `rx=112`. Windows and Linux use the full
-tile. The macOS icons (`.icns`, `sheetcraft-macos-512.png`) sit on Apple's grid: an 824/1024
+tile. The macOS icons (`.icns`, `vsheet-macos-512.png`) sit on Apple's grid: an 824/1024
 body with a transparent margin.
 
 ## Files
 
 | File | Use |
 |---|---|
-| `sheetcraft.svg` | Canonical artwork; also `hicolor/scalable` |
-| `sheetcraft-1024.png` | 1024 px render of the full tile |
-| `sheetcraft-macos-512.png` | Runtime Dock icon on macOS (for `apps/sheetcraft` to embed) |
-| `sheetcraft.icns` | macOS bundle icon (`CFBundleIconFile`) |
-| `sheetcraft.ico` | Windows exe icon, 16–256 px (embedded by `apps/sheetcraft/build.rs`) |
-| `hicolor/<size>/apps/ai.storyteller.sheetcraft.png` | Linux icon theme, 16–512 px; the 256 px one is also the runtime window icon on Windows and Linux |
-| `hicolor/scalable/apps/ai.storyteller.sheetcraft.svg` | Linux scalable icon |
+| `vsheet.svg` | Canonical artwork; also `hicolor/scalable` |
+| `vsheet-1024.png` | 1024 px render of the full tile |
+| `vsheet-macos-512.png` | Runtime Dock icon on macOS (for `apps/vsheet` to embed) |
+| `vsheet.icns` | macOS bundle icon (`CFBundleIconFile`) |
+| `vsheet.ico` | Windows exe icon, 16–256 px (embedded by `apps/vsheet/build.rs`) |
+| `hicolor/<size>/apps/ai.storyteller.vsheet.png` | Linux icon theme, 16–512 px; the 256 px one is also the runtime window icon on Windows and Linux |
+| `hicolor/scalable/apps/ai.storyteller.vsheet.svg` | Linux scalable icon |
 | `LICENSE.txt` | MIT OR Apache-2.0 |
 
-The app ID is `ai.storyteller.sheetcraft`. It's used for the hicolor icon names, the Wayland app
-ID and `packaging/linux/ai.storyteller.sheetcraft.desktop`.
+The app ID is `ai.storyteller.vsheet`. It's used for the hicolor icon names, the Wayland app
+ID and `packaging/linux/ai.storyteller.vsheet.desktop`.
 
 ## Regenerate
 
-Edit `sheetcraft.svg`, then run `packaging/icons.sh`. It needs `resvg`, and `iconutil` for the
+Edit `vsheet.svg`, then run `packaging/icons.sh`. It needs `resvg`, and `iconutil` for the
 `.icns` (macOS only). It packs the `.ico` with `cargo xtask ico`.

@@ -1,29 +1,29 @@
-# sheetcraft-cli
+# vsheet-cli
 
-Headless SheetCraft: inspect, convert, evaluate, script and serve MCP without a window. Errors go to stderr with a
+Headless VSheet: inspect, convert, evaluate, script and serve MCP without a window. Errors go to stderr with a
 non-zero exit code.
 
 ```sh
-cargo install --path apps/sheetcraft-cli     # or: cargo run -p sheetcraft-cli -- <subcommand>
+cargo install --path apps/vsheet-cli     # or: cargo run -p vsheet-cli -- <subcommand>
 ```
 
 | Subcommand | Example |
 |---|---|
-| `info <file> [--json]` | `sheetcraft-cli info book.xlsx` — sheets, used ranges, cell counts, tables, charts, names. |
-| `convert <in> <out> [--sheet NAME]` | `sheetcraft-cli convert book.xlsx data.csv --sheet Sales` — output format from the extension: `.xlsx`, `.csv`, `.tsv`, `.json`, `.html`. |
-| `eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]` | `sheetcraft-cli eval '=PMT(5%/12,360,-300000)'`; `sheetcraft-cli eval '=SUM(B2:B9)' --in book.xlsx` |
-| `cat <file> [--range R] [--sheet S] [--formulas] [--csv]` | `sheetcraft-cli cat book.xlsx --range A1:F20` — aligned table of displayed values. |
+| `info <file> [--json]` | `vsheet-cli info book.xlsx` — sheets, used ranges, cell counts, tables, charts, names. |
+| `convert <in> <out> [--sheet NAME]` | `vsheet-cli convert book.xlsx data.csv --sheet Sales` — output format from the extension: `.xlsx`, `.csv`, `.tsv`, `.json`, `.html`. |
+| `eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]` | `vsheet-cli eval '=PMT(5%/12,360,-300000)'`; `vsheet-cli eval '=SUM(B2:B9)' --in book.xlsx` |
+| `cat <file> [--range R] [--sheet S] [--formulas] [--csv]` | `vsheet-cli cat book.xlsx --range A1:F20` — aligned table of displayed values. |
 | `run …` | see below |
-| `commands [--json] [--search X]` | `sheetcraft-cli commands --search border` — every command with its parameter docs. |
-| `functions [--json] [--search X] [--category C]` | `sheetcraft-cli functions --search lookup` |
+| `commands [--json] [--search X]` | `vsheet-cli commands --search border` — every command with its parameter docs. |
+| `functions [--json] [--search X] [--category C]` | `vsheet-cli functions --search lookup` |
 | `mcp [--connect PORT] [--in FILE \| --sample NAME]` | MCP server on stdio ([mcp.md](mcp.md)). |
-| `send <port> <method> [json]` | `sheetcraft-cli send 7979 engine.execute '{"command":"home.bold","params":{"range":"A1:C1"}}'` — one control-channel request to a running app (`sheetcraft --control 7979`). |
-| `version` | Prints `sheetcraft-cli <version>`. |
+| `send <port> <method> [json]` | `vsheet-cli send 7979 engine.execute '{"command":"home.bold","params":{"range":"A1:C1"}}'` — one control-channel request to a running app (`vsheet --control 7979`). |
+| `version` | Prints `vsheet-cli <version>`. |
 
 ## `run`
 
 ```sh
-sheetcraft-cli run [--in FILE | --sample budget|sales|grades] \
+vsheet-cli run [--in FILE | --sample budget|sales|grades] \
     [--cmd 'id={json}']... [--script steps.jsonl] \
     [--out FILE] [--print RANGE|used] [--sheet S] [--csv] [--formulas] [--quiet]
 ```
@@ -36,11 +36,11 @@ A `--cmd` is `id`, `id={json}` or `id {json}`. A script has one command per line
 `{"command": "cell.set", "params": {...}}`; blank lines and `#` comments are skipped.
 
 ```sh
-sheetcraft-cli run --in book.xlsx \
+vsheet-cli run --in book.xlsx \
   --cmd 'home.bold={"range":"A1:C1"}' \
   --cmd 'cell.set={"cell":"D2","input":"=B2*C2"}' \
   --cmd 'edit.fillDown={"range":"D2:D20"}' \
   --out book.xlsx --print A1:D5
 ```
 
-Command ids and parameters: `sheetcraft-cli commands`.
+Command ids and parameters: `vsheet-cli commands`.
