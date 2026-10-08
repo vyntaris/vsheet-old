@@ -160,6 +160,50 @@ alpha. Next up: signed release builds, XLSX fidelity on real-world files, perfor
 sheets, then slicers, Solver, chart trendlines and a true Page Layout view. The plan and estimates
 are in [ROADMAP.md](ROADMAP.md).
 
+## Downloads
+
+Every [release](https://github.com/storytold/gridcraft/releases/latest) ships these builds. `<ver>` is the
+version number; `SHA256SUMS.txt` lists a checksum for every file.
+
+### macOS
+
+| Build | File | Notes |
+|---|---|---|
+| App, universal (Apple silicon + Intel) | `vsheet-<ver>-macos-universal.dmg` | Signed and notarized |
+| Command-line tool, universal | `vsheet-cli-<ver>-macos-universal.zip` | Signed and notarized |
+
+### Windows
+
+| Build | Installer | Portable |
+|---|---|---|
+| x64 (64-bit Intel/AMD) | `vsheet-<ver>-windows-x64.msi` | `vsheet-<ver>-windows-x64-portable.zip` |
+| arm64 (Snapdragon and other ARM PCs) | `vsheet-<ver>-windows-arm64.msi` | `vsheet-<ver>-windows-arm64-portable.zip` |
+| x86 (32-bit) | `vsheet-<ver>-windows-x86.msi` | `vsheet-<ver>-windows-x86-portable.zip` |
+
+Installers and executables are code-signed.
+
+### Linux
+
+| Format | x86_64 | aarch64 (ARM64) | Notes |
+|---|---|---|---|
+| AppImage | `vsheet-<ver>-linux-x86_64.AppImage` | `vsheet-<ver>-linux-aarch64.AppImage` | Runs anywhere; updates itself with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
+| Flatpak | `vsheet-<ver>-linux-x86_64.flatpak` | `vsheet-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
+| Debian/Ubuntu | `vsheet-<ver>-linux-x86_64.deb` | `vsheet-<ver>-linux-aarch64.deb` | |
+| Fedora/RHEL/openSUSE | `vsheet-<ver>-linux-x86_64.rpm` | `vsheet-<ver>-linux-aarch64.rpm` | |
+| Tarball | `vsheet-<ver>-linux-x86_64.tar.gz` | `vsheet-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
+
+### FreeBSD
+
+| Build | File |
+|---|---|
+| x86_64 | `vsheet-<ver>-freebsd-x86_64.tar.gz` |
+
+### Web (WebAssembly)
+
+| Build | File | Notes |
+|---|---|---|
+| Static site | `vsheet-web-<ver>.zip` | Runs in a modern browser; host it on any static server |
+
 ## The Crafting Apps
 
 VSheet is one of the **Crafting Apps**: free, open-source creative tools from the
