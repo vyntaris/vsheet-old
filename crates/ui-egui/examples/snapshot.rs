@@ -1,7 +1,7 @@
 //! Renders the whole VSheet window offscreen (wgpu, no window) to a PNG.
 //!
 //! `cargo run --release -p vsheet-ui-egui --example snapshot -- [--sample sales] [--in file.xlsx]
-//!  [--size 1440x900] [--scale 2] [--cmd 'id={json}']... [--tab Insert] [--dark] [--language ja]
+//!  [--size 1440x900] [--scale 2] [--cmd 'id={json}']... [--tab Insert] [--dark] [--language en|ja|pt]
 //!  [--dialog 'name={json}'] out.png`
 
 use vsheet_engine::Session;
