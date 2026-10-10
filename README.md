@@ -107,6 +107,9 @@ cargo run --release -p vsheet -- --sample sales --control 7979   # + JSON contro
 cargo xtask ci                                                 # fmt, clippy, tests, assets, layering, wasm
 ```
 
+Choose Español under View → Interface language for [Spanish formula names, decimal commas, and semicolon arguments](docs/formula-input.md).
+Workbooks, clipboard exchange, and programmatic APIs retain canonical English syntax.
+
 ### Web
 
 ```sh
