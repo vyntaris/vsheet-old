@@ -115,6 +115,19 @@ cd apps/vsheet-web && trunk serve --release     # http://127.0.0.1:8771  (?sampl
 You need [trunk](https://trunkrs.dev) and the `wasm32-unknown-unknown` target. Open uses the
 browser's file picker (dropping files works too) and Save downloads the workbook.
 
+### Logs
+
+The desktop app writes its log to standard error and to `vsheet.log` in the `logs` folder
+next to its settings: `~/.config/vsheet/logs` on Linux and BSD (`$XDG_CONFIG_HOME/vsheet/logs`
+when set), `~/Library/Application Support/VSheet/logs` on macOS and
+`%APPDATA%\VSheet\logs` on Windows. Each start moves the previous log to `vsheet.1.log` and
+that one to `vsheet.2.log`, so the log of a run that crashed survives the next start; attach
+them to a bug report. A log file stops growing at 16 MiB. By default VSheet's own crates log
+at `info` and everything else at `warn`; `RUST_LOG` replaces that with env_logger-style
+directives, e.g. `RUST_LOG=debug` or `RUST_LOG=warn,vsheet_engine=debug` (a trailing `*`
+matches a prefix: `vsheet*=debug`). Runs with `VSHEET_NO_PREFS` set (no saved settings)
+log to standard error only.
+
 ## For agents: MCP, CLI and the control channel
 
 ```sh
