@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and package VSheet for Linux (<arch> is x86_64 or aarch64):
+# Build and package VSheet for Linux (<arch> is x86_64 or aarch64, or riscv64 when cross-compiling):
 #
 #   $DIST/vsheet-<version>-linux-<arch>.AppImage  any distro with glibc >= the build host's
 #   $DIST/vsheet-<version>-linux-<arch>.AppImage.zsync  delta updates (needs zsyncmake)
@@ -143,7 +143,7 @@ fi
 if [ -z "${CROSS_TARGET:-}" ]; then
   "$STAGE/usr/bin/vsheet-cli" --version
 elif [ -n "${EMULATOR:-}" ]; then
-  $EMULATOR "$STAGE/usr/bin/vsheet-cli" --version
+  "$EMULATOR" "$STAGE/usr/bin/vsheet-cli" --version
 fi
 echo "==> done"
 ls -lh "$DIST"
