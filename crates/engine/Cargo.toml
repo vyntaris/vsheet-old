@@ -23,3 +23,6 @@ vsheet-xlsx = { workspace = true }
 vsheet-chart = { workspace = true }
 vsheet-pdf = { workspace = true }
 image = { workspace = true }
+
+[dev-dependencies]
+zip = { workspace = true }
