@@ -47,8 +47,7 @@ fn open(s: &mut Session, p: &Json) -> Result<Json> {
         return ok();
     };
     let (wb, warnings) = crate::io::open_bytes(&name, &bytes)?;
-    let imported =
-        matches!(crate::io::FileKind::from_path(&name), Some(crate::io::FileKind::Ods | crate::io::FileKind::Xlsb))
+    let imported = matches!(crate::io::FileKind::from_path(&name), Some(crate::io::FileKind::Ods | crate::io::FileKind::Xlsb))
         || matches!(vsheet_xlsx::sniff(&bytes), vsheet_xlsx::Format::Ods | vsheet_xlsx::Format::Xlsb);
     let title = if imported {
         format!("{} (imported).xlsx", std::path::Path::new(&name).file_stem().and_then(|n| n.to_str()).unwrap_or("Book"))
