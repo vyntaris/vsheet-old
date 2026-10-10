@@ -165,6 +165,9 @@ fn services() -> Services {
 }
 
 fn icon() -> Option<egui::IconData> {
+    #[cfg(target_os = "macos")]
+    let bytes = include_bytes!("../../../assets/app-icon/vsheet-macos-512.png");
+    #[cfg(not(target_os = "macos"))]
     let bytes = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/ai.storyteller.vsheet.png");
     let img = image::load_from_memory(bytes).ok()?.to_rgba8();
     Some(egui::IconData { width: img.width(), height: img.height(), rgba: img.into_raw() })
