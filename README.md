@@ -115,6 +115,19 @@ cd apps/vsheet-web && trunk serve --release     # http://127.0.0.1:8771  (?sampl
 You need [trunk](https://trunkrs.dev) and the `wasm32-unknown-unknown` target. Open uses the
 browser's file picker (dropping files works too) and Save downloads the workbook.
 
+### Logs
+
+The desktop app writes its log to standard error and to `vsheet.log` in the `logs` folder
+next to its settings: `~/.config/vsheet/logs` on Linux and BSD (`$XDG_CONFIG_HOME/vsheet/logs`
+when set), `~/Library/Application Support/VSheet/logs` on macOS and
+`%APPDATA%\VSheet\logs` on Windows. Each start moves the previous log to `vsheet.1.log` and
+that one to `vsheet.2.log`, so the log of a run that crashed survives the next start; attach
+them to a bug report. A log file stops growing at 16 MiB. By default VSheet's own crates log
+at `info` and everything else at `warn`; `RUST_LOG` replaces that with env_logger-style
+directives, e.g. `RUST_LOG=debug` or `RUST_LOG=warn,vsheet_engine=debug` (a trailing `*`
+matches a prefix: `vsheet*=debug`). Runs with `VSHEET_NO_PREFS` set (no saved settings)
+log to standard error only.
+
 ## For agents: MCP, CLI and the control channel
 
 ```sh
@@ -159,6 +172,64 @@ we estimate about 65% of what Excel power users rely on. We're roughly 80% of th
 alpha. Next up: signed release builds, XLSX fidelity on real-world files, performance on very large
 sheets, then slicers, Solver, chart trendlines and a true Page Layout view. The plan and estimates
 are in [ROADMAP.md](ROADMAP.md).
+
+## Downloads
+
+**Download VSheet** from GitHub: the [latest release](https://github.com/storytold/gridcraft/releases/latest) has every build listed below, and [all releases](https://github.com/storytold/gridcraft/releases) has earlier versions and their notes. `<ver>` in the file names is the version number, and `SHA256SUMS.txt` lists a checksum for every file.
+
+### Windows
+
+| Build | Installer | Portable |
+|---|---|---|
+| x64 (64-bit Intel/AMD) | `vsheet-<ver>-windows-x64.msi` | `vsheet-<ver>-windows-x64-portable.zip` |
+| arm64 (Snapdragon and other ARM PCs) | `vsheet-<ver>-windows-arm64.msi` | `vsheet-<ver>-windows-arm64-portable.zip` |
+| x86 (32-bit) | `vsheet-<ver>-windows-x86.msi` | `vsheet-<ver>-windows-x86-portable.zip` |
+
+Installers and executables are code-signed.
+
+**If the app doesn't open on Windows:** the desktop app initializes only DirectX 12 by default.
+Letting wgpu also create an OpenGL instance can crash some graphics drivers (AMD's
+`atio6axx.dll`) before the window appears, so the app would flash in Task Manager and quit.
+`WGPU_BACKEND` overrides the default for troubleshooting (for example `dx12` or `vulkan`). In
+PowerShell, from the folder containing the executable:
+
+```powershell
+$env:WGPU_BACKEND = "vulkan"
+& .\vsheet.exe
+Remove-Item Env:WGPU_BACKEND                     # restore the default for later launches
+```
+
+An explicit `gl` override can bring the driver crash back on affected systems. The macOS, Linux
+and web backend defaults are unchanged.
+
+### macOS
+
+| Build | File | Notes |
+|---|---|---|
+| App, universal (Apple silicon + Intel) | `vsheet-<ver>-macos-universal.dmg` | Signed and notarized |
+| Command-line tool, universal | `vsheet-cli-<ver>-macos-universal.zip` | Signed and notarized |
+
+### Linux
+
+| Format | x86_64 | aarch64 (ARM64) | Notes |
+|---|---|---|---|
+| AppImage | `vsheet-<ver>-linux-x86_64.AppImage` | `vsheet-<ver>-linux-aarch64.AppImage` | Runs anywhere; updates itself with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
+| Flatpak | `vsheet-<ver>-linux-x86_64.flatpak` | `vsheet-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
+| Debian/Ubuntu | `vsheet-<ver>-linux-x86_64.deb` | `vsheet-<ver>-linux-aarch64.deb` | |
+| Fedora/RHEL/openSUSE | `vsheet-<ver>-linux-x86_64.rpm` | `vsheet-<ver>-linux-aarch64.rpm` | |
+| Tarball | `vsheet-<ver>-linux-x86_64.tar.gz` | `vsheet-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
+
+### FreeBSD
+
+| Build | File |
+|---|---|
+| x86_64 | `vsheet-<ver>-freebsd-x86_64.tar.gz` |
+
+### Web (WebAssembly)
+
+| Build | File | Notes |
+|---|---|---|
+| Static site | `vsheet-web-<ver>.zip` | Runs in a modern browser; host it on any static server |
 
 ## The Crafting Apps
 
