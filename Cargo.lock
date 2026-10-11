@@ -1500,7 +1500,9 @@ dependencies = [
  "vsheet-engine",
  "vsheet-mcp",
  "log",
+ "quick-xml",
  "serde_json",
+ "zip",
 ]
 
 [[package]]

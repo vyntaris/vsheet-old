@@ -5,6 +5,7 @@
 //! vsheet-cli convert <in> <out> [--sheet NAME]
 //! vsheet-cli eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]
 //! vsheet-cli cat <file> [--range A1:D20] [--sheet S] [--formulas] [--csv]
+//! vsheet-cli check <file-or-dir>... [--json] [--tolerance 1e-9] [--max-report N]
 //! vsheet-cli run [--in FILE | --sample NAME] [--cmd 'id={json}']... [--script FILE.jsonl] [--out FILE] [--print RANGE] [--quiet]
 //! vsheet-cli commands [--json] [--search X]
 //! vsheet-cli functions [--json] [--search X] [--category C]
@@ -28,6 +29,8 @@ macro_rules! outln {
     }};
 }
 
+mod check;
+
 use vsheet_engine::Session;
 use serde_json::{Value, json};
 
@@ -36,6 +39,8 @@ const USAGE: &str = "usage:
   vsheet-cli convert <in> <out> [--sheet NAME]         xlsx/csv/tsv/json/html by extension
   vsheet-cli eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]
   vsheet-cli cat <file> [--range A1:D20] [--sheet S] [--formulas] [--csv]
+  vsheet-cli check <file-or-dir>... [--json] [--tolerance 1e-9] [--max-report N]
+                     cached-value calc oracle + XLSX round-trip fidelity (exit 1 on any difference)
   vsheet-cli run [--in FILE | --sample NAME] [--cmd 'id={json}']... [--script FILE.jsonl]
                      [--out FILE] [--print RANGE] [--quiet]
   vsheet-cli commands [--json] [--search X]
@@ -71,6 +76,7 @@ fn main() -> ExitCode {
         Some("eval") => eval(rest),
         Some("cat") => cat(rest),
         Some("run") => run(rest),
+        Some("check") => return check::main(rest),
         Some("commands") => commands(rest),
         Some("functions") => functions(rest),
         Some("mcp") => mcp(rest),
