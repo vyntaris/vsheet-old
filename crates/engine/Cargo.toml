@@ -25,4 +25,5 @@ vsheet-pdf = { workspace = true }
 image = { workspace = true }
 
 [dev-dependencies]
+vsheet-xlsx = { workspace = true, features = ["test-support"] }
 zip = { workspace = true }
