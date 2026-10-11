@@ -8,6 +8,11 @@ description = "VSheet file formats: XLSX (SpreadsheetML) and CSV import/export"
 [lints]
 workspace = true
 
+[features]
+# Builds password-encrypted workbooks in code for other crates' tests (a dev-dependency feature;
+# never enabled in a shipped build).
+test-support = []
+
 [dependencies]
 vsheet-core = { workspace = true }
 vsheet-formula = { workspace = true }
