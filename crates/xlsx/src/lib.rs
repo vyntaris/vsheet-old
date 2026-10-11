@@ -44,7 +44,7 @@ mod tests;
 use vsheet_core::DateSystem;
 use vsheet_model::Workbook;
 
-pub use crypto::{DecryptError, decrypt};
+pub use crypto::{DecryptError, check_encryption, decrypt};
 pub use csv::{read_csv, write_csv};
 pub use ods::read_ods;
 pub use xls::read_xls;
