@@ -182,6 +182,9 @@
              ignored (WiX rejects an empty Value, so it repeats the ProgId). -->
         <RegistryValue Root="HKLM" Key="Software\Classes\.xlsx\OpenWithProgids" Name="VSheet.Workbook" Value="VSheet.Workbook" Type="string" />
         <RegistryValue Root="HKLM" Key="Software\Classes\.xlsm\OpenWithProgids" Name="VSheet.Workbook" Value="VSheet.Workbook" Type="string" />
+        <!-- .xlsb and .ods are imported (data only) into a new workbook that saves as .xlsx. -->
+        <RegistryValue Root="HKLM" Key="Software\Classes\.xlsb\OpenWithProgids" Name="VSheet.Workbook" Value="VSheet.Workbook" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\.ods\OpenWithProgids" Name="VSheet.Workbook" Value="VSheet.Workbook" Type="string" />
         <RegistryValue Root="HKLM" Key="Software\Classes\.csv\OpenWithProgids" Name="VSheet.TextData" Value="VSheet.TextData" Type="string" />
         <RegistryValue Root="HKLM" Key="Software\Classes\.tsv\OpenWithProgids" Name="VSheet.TextData" Value="VSheet.TextData" Type="string" />
 
