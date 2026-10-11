@@ -29,7 +29,7 @@ use vsheet_model::Workbook;
 use serde::Serialize;
 use serde_json::Value as Json;
 
-pub use cmd::{CommandInfo, CommandSpec, command_specs, find_command};
+pub use cmd::{CommandInfo, CommandSpec, command_specs, find_command, register_test_command};
 pub use vsheet_calc as calc;
 pub use vsheet_core as core;
 pub use vsheet_formula as formula;
