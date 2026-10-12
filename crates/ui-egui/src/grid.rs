@@ -1696,7 +1696,9 @@ fn interact(app: &mut SheetApp, ui: &mut egui::Ui, resp: &egui::Response, geo: &
             app.selected_chart = Some(id);
             if kind == "shape"
                 && resp.double_clicked()
-                && sh.shapes.iter().any(|s| s.id == id && s.kind == vsheet_engine::model::ShapeKind::TextBox)
+                && sh.shapes.iter().any(|s| {
+                    s.id == id && matches!(s.kind, vsheet_engine::model::ShapeKind::TextBox | vsheet_engine::model::ShapeKind::WordArt)
+                })
             {
                 app.begin_text_box_edit(id);
                 return;
