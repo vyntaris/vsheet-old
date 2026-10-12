@@ -704,7 +704,7 @@ fn delete_sheet(s: &mut Session, p: &Json) -> Result<Json> {
                 *sc -= 1;
             }
             // Names referring to the sheet become #REF!.
-            if let Ok(e) = vsheet_formula::parse(&n.formula) {
+            if let Ok(e) = vsheet_formula::parse_name(&n.formula) {
                 let ne = vsheet_formula::adjust::delete_sheet(e.clone(), &name, &order);
                 if ne != e {
                     n.formula = vsheet_formula::print(&ne);
@@ -766,7 +766,7 @@ fn rename_sheet(s: &mut Session, p: &Json) -> Result<Json> {
             }
         }
         for n in cx.wb.names.iter_mut() {
-            if let Ok(e) = vsheet_formula::parse(&n.formula) {
+            if let Ok(e) = vsheet_formula::parse_name(&n.formula) {
                 n.formula = vsheet_formula::print(&vsheet_formula::adjust::rename_sheet(e, &old, &name));
             }
         }
@@ -805,7 +805,7 @@ fn move_sheet(s: &mut Session, p: &Json) -> Result<Json> {
                 .iter()
                 .filter(|nm| nm.scope == Some(i))
                 .map(|nm| {
-                    let formula = vsheet_formula::parse(&nm.formula)
+                    let formula = vsheet_formula::parse_name(&nm.formula)
                         .map(|e| vsheet_formula::print(&vsheet_formula::adjust::rename_sheet(e, &base, &sh.name)))
                         .unwrap_or_else(|_| nm.formula.clone());
                     vsheet_model::DefinedName { scope: Some(at), formula, ..nm.clone() }

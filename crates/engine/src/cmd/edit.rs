@@ -1206,7 +1206,7 @@ pub(crate) fn rewrite_all_formulas(wb: &mut vsheet_model::Workbook, target: &str
         }
     }
     for n in wb.names.iter_mut() {
-        if let Ok(expr) = vsheet_formula::parse(&n.formula) {
+        if let Ok(expr) = vsheet_formula::parse_name(&n.formula) {
             // Names are workbook-level: unqualified refs don't occur; qualified ones adjust.
             let new = vsheet_formula::adjust::adjust(expr, "\u{0}", target, e);
             n.formula = vsheet_formula::print(&new);
