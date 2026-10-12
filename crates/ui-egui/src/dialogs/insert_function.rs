@@ -26,7 +26,7 @@ pub(super) fn insert_function(app: &mut SheetApp, ui: &mut egui::Ui, d: &mut Dia
     egui::ScrollArea::vertical().max_height(260.0).show(ui, |ui| {
         for (i, f) in hits.iter().enumerate() {
             let name = locale.function_name(f["name"].as_str().unwrap_or(""));
-            let category = language.tr(function_category_label(f["category"].as_str().unwrap_or("")));
+            let category = language.tr(crate::function_library::category_label(f["category"].as_str().unwrap_or("")));
             let r = ui.add(egui::Button::selectable(i == d.list_index, format!("{name:<18} {category}")).min_size(vec2(480.0, 20.0)));
             if r.clicked() {
                 d.list_index = i;
@@ -56,17 +56,5 @@ pub(super) fn insert_function(app: &mut SheetApp, ui: &mut egui::Ui, d: &mut Dia
     }
     if !open {
         *confirm = true;
-    }
-}
-
-/// Excel's name for a function category, given the catalog's id (`MathTrig`).
-fn function_category_label(id: &str) -> &str {
-    match id {
-        "DateTime" => "Date & Time",
-        "Lookup" => "Lookup & Reference",
-        "MathTrig" => "Math & Trig",
-        "AddIn" => "Add-in and Automation",
-        // Financial, Logical, Text, Statistical, Engineering, Database, Information, …
-        other => other,
     }
 }
