@@ -184,7 +184,7 @@ impl CfCache {
                 },
                 CfRule::TimePeriod { period, style } => match v.as_f64() {
                     Some(n) => {
-                        let today = vsheet_calc::now_serial().floor();
+                        let today = vsheet_core::date::serial_in_system(wb.date_system, vsheet_calc::now_serial()).floor();
                         let d = n.floor();
                         let wd = vsheet_core::date::datetime_from_serial(wb.date_system, today).map(|x| x.weekday as f64).unwrap_or(0.0);
                         let week_start = today - wd;
