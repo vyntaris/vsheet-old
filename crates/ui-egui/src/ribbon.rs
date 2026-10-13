@@ -2458,11 +2458,13 @@ pub fn shortcut(app: &mut SheetApp, key: Key, m: Modifiers) {
         }
         Key::Semicolon => {
             // Insert today's date.
-            let today = vsheet_engine::calc::now_serial().floor();
             let text = app
                 .session
                 .active()
-                .map(|d| vsheet_engine::display::format(&vsheet_engine::core::Value::Number(today), "m/d/yyyy", &d.wb).text)
+                .map(|d| {
+                    let today = vsheet_engine::core::date::serial_in_system(d.wb.date_system, vsheet_engine::calc::now_serial()).floor();
+                    vsheet_engine::display::format(&vsheet_engine::core::Value::Number(today), "m/d/yyyy", &d.wb).text
+                })
                 .unwrap_or_default();
             app.begin_edit(Some(text), false);
             None
