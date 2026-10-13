@@ -1024,7 +1024,14 @@ fn shift_table_columns(t: &mut vsheet_model::Table, at: u32, count: u32, insert:
                         break name;
                     }
                 };
-                let col = vsheet_model::TableColumn { name, totals: Default::default(), totals_label: None, formula: None };
+                let col = vsheet_model::TableColumn {
+                    name,
+                    totals: Default::default(),
+                    totals_label: None,
+                    formula: None,
+                    unique_name: None,
+                    xml: None,
+                };
                 t.columns.insert((idx + k).min(t.columns.len()), col);
             }
         }
