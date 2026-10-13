@@ -1,5 +1,5 @@
 //! Overflowing worksheet tabs, exercised through their actual painted geometry and input.
-use egui::{Color32, Event, Modifiers, PointerButton, Rect, Shape, pos2, vec2};
+use egui::{Event, Modifiers, PointerButton, Rect, Shape, pos2, vec2};
 use vsheet_engine::Session;
 use vsheet_ui_egui::SheetApp;
 use serde_json::json;
