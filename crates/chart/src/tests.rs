@@ -5,6 +5,8 @@ use vsheet_model::{Anchor, Chart, ChartKind, Color, LegendPos, Series, Sparkline
 
 use crate::*;
 
+mod budget;
+
 const ALL_KINDS: [ChartKind; 25] = [
     ChartKind::ColumnClustered,
     ChartKind::ColumnStacked,
