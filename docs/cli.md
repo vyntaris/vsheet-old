@@ -24,7 +24,7 @@ cargo install --path apps/vsheet-cli     # or: cargo run -p vsheet-cli -- <subco
 |---|---|
 | `info <file> [--json]` | `vsheet-cli info book.xlsx` — sheets, used ranges, cell counts, tables, charts, names. |
 | `convert <in> <out> [--sheet NAME]` | `vsheet-cli convert book.xlsx data.csv --sheet Sales` — output format from the extension: `.xlsx`, `.csv`, `.tsv`, `.json`, `.html`. |
-| `eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]` | `vsheet-cli eval '=PMT(5%/12,360,-300000)'`; `vsheet-cli eval '=SUM(B2:B9)' --in book.xlsx` |
+| `eval <formula> [--in FILE] [--sheet S] [--cell A1] [--json]` | `vsheet-cli eval '=PMT(5%/12,360,-300000)'`; `vsheet-cli eval '=SUM(B2:B9)' --in book.xlsx` — formulas in English with `,` between arguments. A formula that couldn't be entered in a cell (it doesn't parse, or a function gets the wrong number of arguments) is an error saying why; an unknown function is `#NAME?`, as in Excel. |
 | `cat <file> [--range R] [--sheet S] [--formulas] [--csv]` | `vsheet-cli cat book.xlsx --range A1:F20` — aligned table of displayed values. |
 | `check <file-or-dir>... [--json] [--tolerance 1e-9] [--max-report N]` | `vsheet-cli check corpus/` — calc oracle and XLSX round-trip fidelity, see below. |
 | `run …` | see below |

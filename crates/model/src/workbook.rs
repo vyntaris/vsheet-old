@@ -233,7 +233,7 @@ impl Workbook {
             }
         }
         for n in self.names.iter_mut() {
-            if let Ok(e) = vsheet_formula::parse(&n.formula) {
+            if let Ok(e) = vsheet_formula::parse_name(&n.formula) {
                 let ne = spell_calls(e.clone(), &lambdas);
                 if ne != e {
                     n.formula = vsheet_formula::print(&ne);
