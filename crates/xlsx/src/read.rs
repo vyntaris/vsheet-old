@@ -3,9 +3,7 @@
 use std::sync::Arc;
 
 use vsheet_core::{DateSystem, RangeRef};
-use vsheet_model::{
-    CalcMode, CellPicture, DefinedName, PhoneticString, Sheet, ShowObjects, Style, StyleId, StyleTable, Visibility, Workbook,
-};
+use vsheet_model::{CalcMode, CellPicture, DefinedName, PhoneticString, Sheet, ShowObjects, Style, StyleId, StyleTable, Visibility, Workbook};
 
 use crate::package::{Package, Rel};
 use crate::styles::{StylesIn, read_styles};
