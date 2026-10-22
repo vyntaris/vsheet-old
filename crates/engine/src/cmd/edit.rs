@@ -183,15 +183,8 @@ pub(crate) fn input_to_cell(input: &str, sheet: usize, at: CellRef, wb: &mut vsh
 /// Parses a formula as it is typed (without the `=`). Excel closes missing parentheses for you,
 /// and refuses a formula that still doesn't parse.
 pub(crate) fn parse_typed_formula(body: &str) -> Result<vsheet_formula::Expr> {
-    let mut text = body.to_string();
-    let mut parsed = vsheet_formula::parse(&text);
-    for _ in 0..8 {
-        if parsed.is_ok() {
-            break;
-        }
-        text.push(')');
-        parsed = vsheet_formula::parse(&text);
-    }
+    // Excel closes missing parentheses for you.
+    let parsed = vsheet_formula::parse_closing_parens(body, vsheet_formula::parse);
     parsed.map_err(|e| EngineError::Other(format!("There's a problem with this formula: {e}")))
 }
 
