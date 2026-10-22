@@ -606,13 +606,15 @@ fn evaluate_formula(s: &mut Session, p: &Json) -> Result<Json> {
     let mut steps = Vec::new();
     let mut nodes = Vec::new();
     expr.walk(&mut |e| {
+        // Borrowed, not cloned: copying every operator of a long chain A1+A2+… copies the
+        // rest of the chain each time (quadratic memory).
         if matches!(e, vsheet_formula::Expr::Call(..) | vsheet_formula::Expr::Binary(..) | vsheet_formula::Expr::Ref(_)) {
-            nodes.push(e.clone());
+            nodes.push(e);
         }
     });
     for e in nodes.into_iter().rev().take(200) {
-        let v = vsheet_calc::recalc::evaluate_expr(&d.wb, sheet, at, &e);
-        steps.push(json!({"expression": vsheet_formula::print(&e), "value": crate::cmd::inspect::value_json(&v)}));
+        let v = vsheet_calc::recalc::evaluate_expr(&d.wb, sheet, at, e);
+        steps.push(json!({"expression": vsheet_formula::print(e), "value": crate::cmd::inspect::value_json(&v)}));
     }
     let result = vsheet_calc::recalc::evaluate_expr(&d.wb, sheet, at, &expr);
     Ok(json!({"formula": format!("={text}"), "steps": steps, "result": crate::cmd::inspect::value_json(&result)}))
