@@ -23,7 +23,7 @@
 //!
 //! Knobs (environment variables):
 //! - `VSHEET_FUZZ_SEEDS` (default 6) and `VSHEET_FUZZ_STEPS` (default 40): the budget. Soak with
-//!   `VSHEET_FUZZ_SEEDS=200 VSHEET_FUZZ_STEPS=200 cargo test --release -p vsheet-engine --test command_sequence_fuzz`.
+//!   `VSHEET_FUZZ_SEEDS=200 VSHEET_FUZZ_STEPS=200 cargo test --release -p vsheet-engine --test it command_sequence_fuzz::`.
 //! - `VSHEET_FUZZ_SEED=17`: replay that one seed (the failure message prints the command line).
 //! - `VSHEET_FUZZ_SHRINK=1`: on failure, shrink the sequence to a minimal list of commands that
 //!   still fails the same way, printed as `execute` calls ready for a regression test.
@@ -138,7 +138,7 @@ fn report(seed: u64, steps: usize, sample: &str, sequence: &[Step], f: &Failure)
         None => format!("end-of-run checks after {} steps", sequence.len()),
     };
     let mut out = format!(
-        "command-sequence fuzz failure: seed {seed} (sample `{sample}`), {at}\n  invariant [{}]: {}\n  replay: VSHEET_FUZZ_SEED={seed} VSHEET_FUZZ_STEPS={steps} cargo test -p vsheet-engine --test command_sequence_fuzz\n",
+        "command-sequence fuzz failure: seed {seed} (sample `{sample}`), {at}\n  invariant [{}]: {}\n  replay: VSHEET_FUZZ_SEED={seed} VSHEET_FUZZ_STEPS={steps} cargo test -p vsheet-engine --test it command_sequence_fuzz::\n",
         f.kind, f.what
     );
     let end = (f.step + 1).min(sequence.len());
