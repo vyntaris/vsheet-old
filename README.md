@@ -7,6 +7,10 @@
   </a>
 </p>
 
+<p align="center">
+  <img src="assets/app-icon/hicolor/256x256/apps/ai.storyteller.vsheet.png" width="128" height="128" alt="VSheet icon: a spreadsheet page on a green tile">
+</p>
+
 <h1 align="center">VSheet</h1>
 
 <p align="center">
