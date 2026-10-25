@@ -1,4 +1,4 @@
-use super::show::ok_cancel;
+use super::show::{ok_cancel, take_first_focus};
 use super::{Dialog, Json, SheetApp, json, vec2};
 
 /// Insert Function: search names (as the formula language spells them) and descriptions, or pick
@@ -10,7 +10,8 @@ pub(super) fn insert_function(app: &mut SheetApp, ui: &mut egui::Ui, d: &mut Dia
     ui.horizontal(|ui| {
         ui.label(language.tr("Search:"));
         let r = ui.add(egui::TextEdit::singleline(&mut d.search).desired_width(300.0).hint_text(language.tr("e.g. lookup, average, date")));
-        r.request_focus();
+        // Once only, so Tab can move on to the category list.
+        take_first_focus(d, &r);
     });
     // A new search (typed, or set through the control channel) looks through every function, as
     // Excel's does.
