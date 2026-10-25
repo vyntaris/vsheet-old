@@ -856,7 +856,7 @@ impl Dialog {
             "insertFunction" => {
                 // A Function Library menu opens it on its own category.
                 let category = p("category").as_str().unwrap_or(crate::function_library::MOST_RECENTLY_USED).to_string();
-                Dialog::custom("insertFunction", "Formula Builder", json!({"category": category}))
+                Dialog::custom("insertFunction", "Insert Function", json!({"category": category}))
             }
             "find" => {
                 let mut d = Dialog::custom("find", "Find and Replace", json!({"what": "", "with": "", "within": "sheet", "lookIn": "formulas"}));
