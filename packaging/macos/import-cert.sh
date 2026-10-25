@@ -17,12 +17,16 @@ if [[ -z "${APPLE_CERTIFICATE:-}" ]]; then
   exit 0
 fi
 
-TMP="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
-KEYCHAIN="$TMP/vsheet-signing.keychain-db"
-CERT="$TMP/vsheet-signing.p12"
+BASE="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
+# A private directory created exclusively, not predictable names in a possibly shared temp
+# root: another local user's symlink at `vsheet-signing.p12` would otherwise select the
+# write target and capture the decoded certificate.
+WORK="$(mktemp -d "$BASE/vsheet-signing.XXXXXXXX")"
+KEYCHAIN="$WORK/vsheet-signing.keychain-db"
+CERT="$WORK/vsheet-signing.p12"
 KC_PASS="${KEYCHAIN_PASSWORD:-$(openssl rand -hex 24)}"
 
-trap 'rm -f "$CERT"' EXIT
+trap 'rm -rf "$WORK"' EXIT
 printf '%s' "$APPLE_CERTIFICATE" | base64 --decode >"$CERT"
 security create-keychain -p "$KC_PASS" "$KEYCHAIN"
 security set-keychain-settings -lut 21600 "$KEYCHAIN"
