@@ -345,6 +345,10 @@ fn percentrank_impl(a: &[Arg], exc: bool) -> R<Value> {
     if sig < 1.0 || s.is_empty() {
         return Err(CellError::Num);
     }
+    // Excel: 10^significance overflows from 309 up.
+    if sig >= 309.0 {
+        return Err(CellError::Div0);
+    }
     let (first, last) = (s.first().copied().unwrap_or(0.0), s.last().copied().unwrap_or(0.0));
     if x < first || x > last {
         return Err(CellError::NA);
@@ -368,6 +372,10 @@ fn percentrank_impl(a: &[Arg], exc: bool) -> R<Value> {
         let (rl, rh) = (rank_of(lo), rank_of(hi));
         rl + (x - lo) / (hi - lo) * (rh - rl)
     };
+    // From significance 15 up Excel returns 15 significant digits, rounded.
+    if sig >= 15.0 {
+        return num_val(format!("{r:.14e}").parse().unwrap_or(r));
+    }
     num_val(trunc_digits(r, sig))
 }
 
@@ -2490,10 +2498,19 @@ mod tests {
         close(ev("PERCENTRANK.EXC", vec![e9.clone(), n(5.43)]), 0.381);
         close(ev("PERCENTRANK.EXC", vec![e9, n(5.43), n(1.0)]), 0.3);
         let t = c(&[1.0, 2.0, 3.0]);
-        close(ev("PERCENTRANK", vec![t.clone(), n(2.0), n(400.0)]), 0.5);
-        close(ev("PERCENTRANK.INC", vec![t.clone(), n(2.0), n(400.0)]), 0.5);
-        close(ev("PERCENTRANK.INC", vec![t.clone(), n(1.0), n(400.0)]), 0.0);
-        close(ev("PERCENTRANK.EXC", vec![t, n(2.0), n(400.0)]), 0.5);
+        // Excel 16: significance 309 and up is #DIV/0!, 308 still works.
+        for name in ["PERCENTRANK", "PERCENTRANK.INC", "PERCENTRANK.EXC"] {
+            is_err(ev(name, vec![t.clone(), n(2.0), n(309.0)]), CellError::Div0);
+            is_err(ev(name, vec![t.clone(), n(1.0), n(400.0)]), CellError::Div0);
+            close(ev(name, vec![t.clone(), n(2.0), n(308.0)]), 0.5);
+        }
+        // From significance 15 up the result has 15 significant digits.
+        let k = c(&[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);
+        for sig in [15.0, 16.0, 308.0] {
+            close(ev("PERCENTRANK.INC", vec![k.clone(), n(2.123_456_789), n(sig)]), 0.187_242_798_166_667);
+        }
+        close(ev("PERCENTRANK.INC", vec![k.clone(), n(2.123_456_789), n(14.0)]), 0.187_242_798_166_66);
+        close(ev("PERCENTRANK.EXC", vec![k, n(2.123_456_789), n(16.0)]), 0.265_432_098_625);
     }
 
     #[test]

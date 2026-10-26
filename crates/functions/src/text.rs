@@ -334,8 +334,6 @@ fn numbervalue(a: &[Arg], c: &mut dyn Ctx) -> R<Value> {
             if seen_dec {
                 return Err(CellError::Value);
             }
-        } else if c == '.' || c == ',' {
-            return Err(CellError::Value);
         } else {
             out.push(c);
         }
@@ -1225,8 +1223,17 @@ mod tests {
         close(ev("NUMBERVALUE", vec![t(" 1 000 ")]), 1000.0);
         close(ev("NUMBERVALUE", vec![t("")]), 0.0);
         is_err(ev("NUMBERVALUE", vec![t("1.2.3")]), CellError::Value);
-        is_err(ev("NUMBERVALUE", vec![t("1.5"), t(","), t(" ")]), CellError::Value);
-        is_err(ev("NUMBERVALUE", vec![t("1,5"), t("."), t(" ")]), CellError::Value);
+        // Excel 16 (en-US) swaps the given separators, then parses what is left in the host locale.
+        close(ev("NUMBERVALUE", vec![t("1.5"), t(","), t(" ")]), 1.5);
+        close(ev("NUMBERVALUE", vec![t("1 234.5"), t(","), t(" ")]), 1234.5);
+        close(ev("NUMBERVALUE", vec![t("2.5%"), t(","), t(" ")]), 0.025);
+        close(ev("NUMBERVALUE", vec![t("1.5E3"), t(","), t(" ")]), 1500.0);
+        close(ev("NUMBERVALUE", vec![t("1.5"), t(";")]), 1.5);
+        close(ev("NUMBERVALUE", vec![t("1.5"), t("x")]), 1.5);
+        close(ev("NUMBERVALUE", vec![t("1,5"), t(".")]), 15.0);
+        is_err(ev("NUMBERVALUE", vec![t("12.345,6"), t(","), t(" ")]), CellError::Value);
+        is_err(ev("NUMBERVALUE", vec![t("1.2.3"), t(","), t(" ")]), CellError::Value);
+        is_err(ev("NUMBERVALUE", vec![t("1,5"), t("."), t(".")]), CellError::Value);
         is_text(ev("FIXED", vec![n(1234.567), n(1.0)]), "1,234.6");
         is_text(ev("FIXED", vec![n(1234.567), n(-1.0)]), "1,230");
         is_text(ev("FIXED", vec![n(-1234.567), n(1.0), b(true)]), "-1234.6");
