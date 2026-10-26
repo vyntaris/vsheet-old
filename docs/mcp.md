@@ -9,7 +9,7 @@ Two backends:
 | Mode | Command | What it drives |
 |---|---|---|
 | Headless (default) | `vsheet-cli mcp [--in book.xlsx \| --sample budget]` | An in-process engine session — no window. |
-| Remote | `vsheet-cli mcp --connect 7979` | A running app started with `vsheet --control 7979` (TCP JSON lines on `127.0.0.1`). |
+| Remote | `vsheet-cli mcp --connect 7979` | A running app started with `vsheet --control 7979` (TCP JSON lines on `127.0.0.1`, authenticated with the app's token: it is read from the app's token file or `VSHEET_CONTROL_TOKEN`, see [`control-protocol.md`](control-protocol.md)). |
 
 ## Claude Code
 
