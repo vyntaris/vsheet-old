@@ -338,6 +338,10 @@ fn numbervalue(a: &[Arg], c: &mut dyn Ctx) -> R<Value> {
             out.push(c);
         }
     }
+    // A leftover `.` can be a decimal point but never a date separator: `1.2.3` is `#VALUE!` in Excel.
+    if out.matches('.').count() > 1 {
+        return Err(CellError::Value);
+    }
     let mut n = parse_number_text_in(&out, c.date_system()).ok_or(CellError::Value)?;
     for _ in 0..pct {
         n /= 100.0;
