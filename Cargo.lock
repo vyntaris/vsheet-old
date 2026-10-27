@@ -2124,6 +2124,7 @@ dependencies = [
  "aes",
  "vsheet-core",
  "vsheet-formula",
+ "vsheet-functions",
  "vsheet-model",
  "quick-xml 0.41.0",
  "sha1 0.11.0",
