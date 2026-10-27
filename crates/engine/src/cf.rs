@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use vsheet_core::{CellRef, RangeRef, Value, compare};
-use vsheet_model::*;
+use vsheet_model::{CfOperator, CfRule, CfValueKind, Color, CondFormat, PatternType, Sheet, Style, Underline, Workbook, default_icon_thresholds};
 
 /// The conditional look of one cell.
 #[derive(Clone, Debug, Default, PartialEq)]
