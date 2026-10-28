@@ -131,8 +131,6 @@ if has appimage; then
   }
   APPDIR="$WORK/VSheet.AppDir"
   cp -R "$STAGE" "$APPDIR"
-  # Keep the runtime Adwaita MIT notice in the packaged AppImage.
-  install -Dm644 "$ROOT/NOTICE" "$APPDIR/usr/share/doc/vsheet/NOTICE"
   ln -s usr/bin/vsheet "$APPDIR/AppRun"
   cp "$HERE/$APP_ID.desktop" "$APPDIR/$APP_ID.desktop"
   cp "$ROOT/assets/app-icon/hicolor/256x256/apps/$APP_ID.png" "$APPDIR/$APP_ID.png"

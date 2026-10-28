@@ -46,7 +46,6 @@ modules:
       - cargo --offline build --release --locked -p vsheet -p vsheet-cli
       - install -Dm755 target/release/vsheet /app/bin/vsheet
       - install -Dm755 target/release/vsheet-cli /app/bin/vsheet-cli
-      - install -Dm644 NOTICE /app/share/doc/vsheet/NOTICE
       - install -Dm644 packaging/linux/ai.storyteller.vsheet.desktop /app/share/applications/ai.storyteller.vsheet.desktop
       - install -Dm644 packaging/linux/ai.storyteller.vsheet.mime.xml /app/share/mime/packages/ai.storyteller.vsheet.xml
       - mkdir -p /app/share/icons && cp -R assets/app-icon/hicolor /app/share/icons/
