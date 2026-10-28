@@ -359,6 +359,8 @@ mod tests {
         // Excel writes these two without a prefix.
         assert_eq!(file_function_name("NETWORKDAYS.INTL"), None);
         assert_eq!(file_function_name("WORKDAY.INTL"), None);
+        // Excel 16.0 build 20527 saves COPILOT as plain `COPILOT(...)` (it does not know the name yet).
+        assert_eq!(file_function_name("COPILOT"), None);
         assert_eq!(file_function_name("SUM"), None);
         assert_eq!(builtin_format(14), Some("m/d/yyyy"));
         assert_eq!(builtin_id("0.00%"), Some(10));
