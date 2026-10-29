@@ -6,10 +6,12 @@
 //! `table.insertSlicer`) selects everything, i.e. applies no filter.
 
 use vsheet_core::CellRef;
-use vsheet_model::*;
+use vsheet_model::{Anchor, AnchorMode, AutoFilter, FilterCriterion, Slicer, Workbook};
 use serde_json::{Value as Json, json};
 
-use super::*;
+use super::{
+    CommandSpec, EngineError, Result, Session, bad, bool_param, cell_param_on, cmd, edit, f64_param, has_doc, str_param, target_sheet, u32_param,
+};
 
 pub fn specs() -> Vec<CommandSpec> {
     vec![
