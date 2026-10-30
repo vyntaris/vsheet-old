@@ -24,3 +24,5 @@ jobs:
     with:
       app-name: vsheet
       app-dir: VSheet
+      install-relative-path: Programs/ArtCraft/VSheet
+      install-scope: perUser
