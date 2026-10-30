@@ -207,6 +207,7 @@ const FUTURE_FUNCTIONS: &[&str] = &[
     "MODE.SNGL",
     "MUNIT",
     "NEGBINOM.DIST",
+    "NETWORKDAYS.INTL",
     "NORM.DIST",
     "NORM.INV",
     "NORM.S.DIST",
@@ -269,6 +270,7 @@ const FUTURE_FUNCTIONS: &[&str] = &[
     "VSTACK",
     "WEBSERVICE",
     "WEIBULL.DIST",
+    "WORKDAY.INTL",
     "WRAPCOLS",
     "WRAPROWS",
     "XLOOKUP",
@@ -356,9 +358,8 @@ mod tests {
         assert_eq!(file_function_name("stockhistory").as_deref(), Some("_xlfn.STOCKHISTORY"));
         assert_eq!(file_function_name("TRANSLATE").as_deref(), Some("_xlfn.TRANSLATE"));
         assert_eq!(file_function_name("DETECTLANGUAGE").as_deref(), Some("_xlfn.DETECTLANGUAGE"));
-        // Excel writes these two without a prefix.
-        assert_eq!(file_function_name("NETWORKDAYS.INTL"), None);
-        assert_eq!(file_function_name("WORKDAY.INTL"), None);
+        assert_eq!(file_function_name("NETWORKDAYS.INTL").as_deref(), Some("_xlfn.NETWORKDAYS.INTL"));
+        assert_eq!(file_function_name("WORKDAY.INTL").as_deref(), Some("_xlfn.WORKDAY.INTL"));
         // Excel 16.0 build 20527 saves COPILOT as plain `COPILOT(...)` (it does not know the name yet).
         assert_eq!(file_function_name("COPILOT"), None);
         assert_eq!(file_function_name("SUM"), None);
