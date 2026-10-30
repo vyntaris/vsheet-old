@@ -579,4 +579,5 @@ fn checkbox_cells_print_as_boxes_not_true_false() {
     let text = String::from_utf8_lossy(&pdf);
     assert_eq!(text.matches("(TRUE) Tj").count(), 1, "the checked box printed as TRUE");
     assert!(contains(&pdf, "0.063 0.486 0.255 rg"), "the checked box is not filled");
+    assert!(contains(&pdf, "0.431 0.431 0.431 RG"), "the unchecked box is not outlined");
 }
