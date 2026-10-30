@@ -225,7 +225,7 @@ fn percentiles() {
     for sig in [15.0, 16.0, 308.0] {
         close_tol(ev("PERCENTRANK.INC", vec![k.clone(), n(2.123_456_789), n(sig)]), 0.187_242_798_166_667, 1e-16);
     }
-    close(ev("PERCENTRANK.INC", vec![k.clone(), n(2.123_456_789), n(14.0)]), 0.187_242_798_166_66);
+    close_tol(ev("PERCENTRANK.INC", vec![k.clone(), n(2.123_456_789), n(14.0)]), 0.187_242_798_166_66, 1e-15);
     close(ev("PERCENTRANK.EXC", vec![k, n(2.123_456_789), n(16.0)]), 0.265_432_098_625);
 }
 
