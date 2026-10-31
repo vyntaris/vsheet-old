@@ -405,6 +405,16 @@ fn t_chi_f() {
 }
 
 #[test]
+fn f_distributions_accept_ten_billion_degrees() {
+    close_tol(ev("F.DIST", vec![n(0.0), n(10_000_000_000.0), n(1.0), b(false)]), 0.0, 0.0);
+    close_tol(ev("F.DIST.RT", vec![n(0.0), n(1.0), n(10_000_000_000.0)]), 1.0, 0.0);
+    close_tol(ev("F.INV", vec![n(0.5), n(10_000_000_000.0), n(1.0)]), 2.198110953542527, 1e-9);
+    close_tol(ev("F.DIST.RT", vec![n(0.0), n(9_999_999_999.0), n(1.0)]), 1.0, 0.0);
+    is_err(ev("F.DIST.RT", vec![n(0.0), n(10_000_000_001.0), n(1.0)]), CellError::Num);
+    is_err(ev("F.DIST.RT", vec![n(0.0), n(1.0), n(10_000_000_001.0)]), CellError::Num);
+}
+
+#[test]
 fn binom_inv_huge_trials_returns() {
     // Above 2^53 neighbouring f64 values are more than 1 apart; the bisection must still end.
     let cases: [(&str, f64, f64, f64); 3] = [("BINOM.INV", 1e17, 0.5, 0.5), ("CRITBINOM", 1e300, 1.0, 0.5), ("BINOM.INV", 1e300, 0.5, 0.5)];

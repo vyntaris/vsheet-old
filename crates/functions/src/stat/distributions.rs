@@ -344,7 +344,7 @@ fn f_args(a: &[Arg]) -> R<(f64, f64, f64)> {
     let x = num(a, 0)?;
     let d1 = num(a, 1)?.trunc();
     let d2 = num(a, 2)?.trunc();
-    if d1 < 1.0 || d2 < 1.0 || d1 >= 1e10 || d2 >= 1e10 {
+    if d1 < 1.0 || d2 < 1.0 || d1 > 1e10 || d2 > 1e10 {
         return Err(CellError::Num);
     }
     Ok((x, d1, d2))
