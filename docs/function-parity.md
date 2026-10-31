@@ -1,6 +1,6 @@
 # Function parity: worksheet functions and formulas
 
-> **Last reviewed:** 2026-10-31 · **Last updated:** 2026-10-31 · **Change:** minor (HARMEAN returns `#N/A` when its arguments contain no numeric observations; earlier: BETA.DIST density returns `#NUM!` when an endpoint's corresponding shape parameter is less than or equal to 1; earlier: ECMA.CEILING listed with USDOLLAR as not on Microsoft's list; earlier: IMSQRT reproduces the stray real part Excel gives for negative reals, and the other IM* differences from Excel are listed) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
+> **Last reviewed:** 2026-10-31 · **Last updated:** 2026-10-31 · **Change:** minor (edge cases matched to Excel: base conversions, BITLSHIFT/BITRSHIFT, UNICHAR noncharacters, UPPER/LOWER/PROPER casing, FIXED/DOLLAR output, F/T/GAMMA/WEIBULL/BETA distributions, BINOM trial cap, HARMEAN; earlier: ECMA.CEILING listed with USDOLLAR as not on Microsoft's list; earlier: IMSQRT reproduces the stray real part Excel gives for negative reals) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
 
 Excel's worksheet functions, category by category, against VSheet's function library. Part of
 [target-app-parity.md](target-app-parity.md); gaps feed [gaps.md](gaps.md).
@@ -101,9 +101,9 @@ This improves series preparation; it does not change the model-fitting or season
 | Function | Excel parity note |
 |---|---|
 | BINOM.DIST / BINOM.DIST.RANGE | Trial count is truncated, then must be at most 2,147,483,646; larger trials return `#NUM!`. |
-
 | BETA.DIST | Density mode returns `#NUM!` at the lower or upper interval endpoint when the corresponding shape parameter is less than or equal to 1; cumulative endpoint results remain 0 and 1. |
 | HARMEAN | Returns `#N/A` when arrays and references contain no numeric observations; zero and negative numeric observations still return `#NUM!`. |
+
 **~82% ready.** The library is broad and has 96 test functions in `crates/functions` with many
 assertions each, but there is no conformance suite against Excel-computed results, and user
 reports keep finding edge cases: MIN() with no arguments (#138), COUNTBLANK past the used range
