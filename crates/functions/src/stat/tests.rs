@@ -408,6 +408,7 @@ fn t_chi_f() {
 fn f_distributions_accept_ten_billion_degrees() {
     close_tol(ev("F.DIST", vec![n(0.0), n(10_000_000_000.0), n(1.0), b(false)]), 0.0, 0.0);
     close_tol(ev("F.DIST.RT", vec![n(0.0), n(1.0), n(10_000_000_000.0)]), 1.0, 0.0);
+    close_tol(ev("F.DIST", vec![n(1_000_000.0), n(10_000_000_000.0), n(1.0), b(true)]), 0.999202115, 1e-8);
     close_tol(ev("F.INV", vec![n(0.5), n(10_000_000_000.0), n(1.0)]), 2.198110953542527, 2e-6);
     close_tol(ev("F.DIST.RT", vec![n(0.0), n(9_999_999_999.0), n(1.0)]), 1.0, 0.0);
     is_err(ev("F.DIST.RT", vec![n(0.0), n(10_000_000_001.0), n(1.0)]), CellError::Num);
