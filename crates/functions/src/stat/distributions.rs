@@ -571,7 +571,7 @@ pub(super) fn beta_dist(a: &[Arg], _: C) -> R<Value> {
     if cum {
         return num_val(reg_inc_beta(z, al, be));
     }
-    if (z == 0.0 && al < 1.0) || (z == 1.0 && be < 1.0) {
+    if (z == 0.0 && al <= 1.0) || (z == 1.0 && be <= 1.0) {
         return Err(CellError::Num);
     }
     let lp = if z == 0.0 || z == 1.0 {
