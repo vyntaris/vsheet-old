@@ -427,8 +427,9 @@ fn fixed(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
 
 fn dollar(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let (r, d) = rounded(a, 2.0)?;
+    let negative = r < 0.0 || (r == 0.0 && d >= 0 && num(a, 0)? < 0.0);
     let body = format_fixed(r, d, true);
-    let out = if r < 0.0 { format!("(${body})") } else { format!("${body}") };
+    let out = if negative { format!("(${body})") } else { format!("${body}") };
     if out.len() > 254 {
         return Err(CellError::Value);
     }
@@ -1324,6 +1325,21 @@ mod tests {
         is_err(ev("DOLLAR", vec![n(-1.23456789e186), n(2.0)]), CellError::Value);
         assert!(matches!(ev("DOLLAR", vec![n(1e189), n(-1.0)]), Value::Text(ref s) if s.len() == 254));
         is_err(ev("DOLLAR", vec![n(1e190), n(-1.0)]), CellError::Value);
+    }
+
+    #[test]
+    fn dollar_keeps_negative_sign_when_nonnegative_precision_rounds_to_zero() {
+        is_text(ev("DOLLAR", vec![n(-0.0001), n(0.0)]), "($0)");
+        is_text(ev("DOLLAR", vec![n(-0.0001), n(2.0)]), "($0.00)");
+        is_text(ev("DOLLAR", vec![n(0.0), n(0.0)]), "$0");
+        is_text(ev("DOLLAR", vec![n(-0.0), n(0.0)]), "$0");
+        is_text(ev("DOLLAR", vec![n(0.0001), n(0.0)]), "$0");
+        is_text(ev("DOLLAR", vec![n(-0.0001), n(-1.0)]), "$0");
+        is_text(ev("DOLLAR", vec![n(-4.0), n(-1.0)]), "$0");
+        is_text(ev("DOLLAR", vec![n(-5.0), n(-1.0)]), "($10)");
+        is_text(ev("DOLLAR", vec![n(-0.4), n(0.0)]), "($0)");
+        is_text(ev("DOLLAR", vec![n(-0.5), n(0.0)]), "($1)");
+        is_text(ev("FIXED", vec![n(-0.0001), n(0.0)]), "0");
     }
 
     #[test]
