@@ -1,6 +1,6 @@
 # Function parity: worksheet functions and formulas
 
-> **Last reviewed:** 2026-10-31 · **Last updated:** 2026-10-31 · **Change:** minor (BETA.DIST density returns `#NUM!` when an endpoint's corresponding shape parameter is less than or equal to 1; earlier: BINOM.DIST and BINOM.DIST.RANGE refuse trial counts above 2,147,483,646 after truncation) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
+> **Last reviewed:** 2026-10-31 · **Last updated:** 2026-10-31 · **Change:** minor (HARMEAN returns `#N/A` when its arguments contain no numeric observations; earlier: BETA.DIST density returns `#NUM!` when an endpoint's corresponding shape parameter is less than or equal to 1; earlier: ECMA.CEILING listed with USDOLLAR as not on Microsoft's list; earlier: IMSQRT reproduces the stray real part Excel gives for negative reals, and the other IM* differences from Excel are listed) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
 
 Excel's worksheet functions, category by category, against VSheet's function library. Part of
 [target-app-parity.md](target-app-parity.md); gaps feed [gaps.md](gaps.md).
@@ -103,6 +103,7 @@ This improves series preparation; it does not change the model-fitting or season
 | BINOM.DIST / BINOM.DIST.RANGE | Trial count is truncated, then must be at most 2,147,483,646; larger trials return `#NUM!`. |
 
 | BETA.DIST | Density mode returns `#NUM!` at the lower or upper interval endpoint when the corresponding shape parameter is less than or equal to 1; cumulative endpoint results remain 0 and 1. |
+| HARMEAN | Returns `#N/A` when arrays and references contain no numeric observations; zero and negative numeric observations still return `#NUM!`. |
 **~82% ready.** The library is broad and has 96 test functions in `crates/functions` with many
 assertions each, but there is no conformance suite against Excel-computed results, and user
 reports keep finding edge cases: MIN() with no arguments (#138), COUNTBLANK past the used range
@@ -145,6 +146,7 @@ workbooks; results checked in as data, not Excel files) and fixing what it finds
 | 2026-10-31 | minor | WEIBULL.DIST returns zero at x=0 in both density and cumulative modes, including shape below one; negative x remains `#NUM!` |
 | 2026-10-31 | minor | BINOM.DIST and BINOM.DIST.RANGE reject trial counts above 2,147,483,646 after truncation |
 | 2026-10-31 | minor | BETA.DIST density returns `#NUM!` at the lower endpoint with alpha less than or equal to 1 and upper endpoint with beta less than or equal to 1; cumulative behavior is unchanged |
+| 2026-10-31 | minor | HARMEAN returns `#N/A` when array or reference inputs contain no numbers; nonpositive numeric observations remain `#NUM!` |
 | 2026-10-27 | minor | ECMA.CEILING added to the functions that are in our library but not on Microsoft's list (with USDOLLAR), so the counts don't change |
 | 2026-10-26 | minor | IMSQRT uses Excel's polar route with its cosine reduction, so `IMSQRT("-4")` is `1.22514845490862E-16+2i` as in Excel (exact `2i` before); the rows list the IM* differences still open |
 | 2026-10-25 | minor | LAMBDA row: a LAMBDA that calls itself more than 140 times, and a formula nested past the depth limit, give `#NUM!` (#1809; nesting gave `#CALC!` before). `=Foo(1)` where the defined name Foo holds `#N/A` gives `#N/A`, not `#NAME?` |
