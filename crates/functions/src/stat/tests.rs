@@ -405,6 +405,12 @@ fn t_chi_f() {
 }
 
 #[test]
+fn t_density_is_stable_for_large_degrees() {
+    close_tol(ev("T.DIST", vec![n(0.0), n(100_000_000.0), b(false)]), 0.398942279404077, 1e-12);
+    close_tol(ev("T.DIST", vec![n(0.0), n(10_000_000_000.0), b(false)]), 0.3989422803914591, 1e-12);
+}
+
+#[test]
 fn binom_inv_huge_trials_returns() {
     // Above 2^53 neighbouring f64 values are more than 1 apart; the bisection must still end.
     let cases: [(&str, f64, f64, f64); 3] = [("BINOM.INV", 1e17, 0.5, 0.5), ("CRITBINOM", 1e300, 1.0, 0.5), ("BINOM.INV", 1e300, 0.5, 0.5)];
