@@ -496,13 +496,7 @@ pub(super) fn gamma_dist(a: &[Arg], _: C) -> R<Value> {
         return num_val(reg_gamma_p(al, x / be));
     }
     if x == 0.0 {
-        return if al < 1.0 {
-            Err(CellError::Num)
-        } else if al == 1.0 {
-            Err(CellError::Num)
-        } else {
-            num_val(0.0)
-        };
+        return if al <= 1.0 { Err(CellError::Num) } else { num_val(0.0) };
     }
     num_val(((al - 1.0) * x.ln() - x / be - al * be.ln() - ln_gamma(al)).exp())
 }
