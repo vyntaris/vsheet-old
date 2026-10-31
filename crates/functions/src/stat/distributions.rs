@@ -186,8 +186,14 @@ fn df_arg(a: &[Arg], i: usize) -> R<f64> {
 
 pub(super) fn t_dist(a: &[Arg], _: C) -> R<Value> {
     let x = num(a, 0)?;
-    let v = df_arg(a, 1)?;
+    let v = num(a, 1)?.trunc();
     let cum = boolean(a, 2)?;
+    if v == 0.0 {
+        return Err(if cum { CellError::Num } else { CellError::Div0 });
+    }
+    if v < 0.0 {
+        return Err(CellError::Num);
+    }
     num_val(if cum { t_cdf(x, v) } else { t_pdf(x, v) })
 }
 
