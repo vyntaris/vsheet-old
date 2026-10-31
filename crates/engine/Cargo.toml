@@ -17,6 +17,7 @@ vsheet-model = { workspace = true }
 vsheet-calc = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+web-time = { workspace = true }
 thiserror = { workspace = true }
 log = { workspace = true }
 vsheet-xlsx = { workspace = true }
