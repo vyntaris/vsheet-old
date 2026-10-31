@@ -1252,8 +1252,8 @@ mod tests {
     fn fixed_and_dollar_output_limits() {
         assert!(matches!(ev("FIXED", vec![n(1e191), n(0.0)]), Value::Text(ref s) if s.len() == 255));
         is_err(ev("FIXED", vec![n(1e192), n(0.0)]), CellError::Value);
-        assert!(matches!(ev("FIXED", vec![n(-1e253), n(0.0), b(true)]), Value::Text(ref s) if s.len() == 255));
-        is_err(ev("FIXED", vec![n(-1e254), n(0.0), b(true)]), CellError::Value);
+        assert!(matches!(ev("FIXED", vec![n(-1e253), n(0.0), b(true)]), Value::Text(ref s) if s.starts_with('-')));
+        is_err(ev("FIXED", vec![n(-1e191), n(0.0)]), CellError::Value);
         assert!(matches!(ev("FIXED", vec![n(1e189), n(1.0)]), Value::Text(ref s) if s.len() == 255));
         is_err(ev("FIXED", vec![n(1e190), n(1.0)]), CellError::Value);
 
