@@ -126,12 +126,16 @@ fn upper_char(ch: char) -> char {
     }
 }
 
+fn proper_upper_char(ch: char) -> char {
+    if ch == '\u{130}' { 'I' } else { upper_char(ch) }
+}
+
 fn lower(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
-    text_val(text(a, 0)?.chars().map(lower_char).collect())
+    text_val(text(a, 0)?.chars().map(lower_char).collect::<String>())
 }
 
 fn upper(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
-    text_val(text(a, 0)?.chars().map(upper_char).collect())
+    text_val(text(a, 0)?.chars().map(upper_char).collect::<String>())
 }
 
 fn proper(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
@@ -143,7 +147,7 @@ fn proper(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
             if prev_letter {
                 out.push(lower_char(ch));
             } else {
-                out.push(upper_char(ch));
+                out.push(proper_upper_char(ch));
             }
             prev_letter = true;
         } else {
