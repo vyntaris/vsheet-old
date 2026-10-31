@@ -183,7 +183,9 @@ fn read_font(c: &mut Cursor<'_, '_>) -> Option<(Font, u16)> {
     let weight = c.u16().ok()?;
     let script = c.u16().ok()?;
     let underline = c.u8().ok()?;
-    c.skip(3).ok()?; // family, character set, unused
+    let family = c.u8().ok()?;
+    let charset = c.u8().ok()?;
+    c.skip(1).ok()?; // reserved
     let name = c.short_string().ok()?;
     let mut f = Font::default();
     let name: String = name.chars().filter(|ch| *ch != '\0').take(255).collect();
@@ -209,6 +211,8 @@ fn read_font(c: &mut Cursor<'_, '_>) -> Option<(Font, u16)> {
         0x22 => Underline::DoubleAccounting,
         _ => Underline::None,
     };
+    f.family = Some(family);
+    f.charset = Some(charset);
     Some((f, icv))
 }
 
