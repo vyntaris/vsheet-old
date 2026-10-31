@@ -62,6 +62,15 @@ fn format_base(v: i64, radix: u32, places: Option<f64>) -> R<Value> {
     if v < min || v > max {
         return Err(CellError::Num);
     }
+    let places = places
+        .map(|p| {
+            let p = p.trunc();
+            if !(1.0..=10.0).contains(&p) {
+                return Err(CellError::Num);
+            }
+            Ok(p as usize)
+        })
+        .transpose()?;
     if v < 0 {
         let u = v + (1i64 << bits);
         return text_val(to_radix(u, radix));
@@ -70,11 +79,6 @@ fn format_base(v: i64, radix: u32, places: Option<f64>) -> R<Value> {
     match places {
         None => text_val(s),
         Some(p) => {
-            let p = p.trunc();
-            if !(1.0..=10.0).contains(&p) {
-                return Err(CellError::Num);
-            }
-            let p = p as usize;
             if s.len() > p {
                 return Err(CellError::Num);
             }
@@ -97,7 +101,13 @@ fn to_radix(mut v: i64, radix: u32) -> String {
 }
 
 fn places_arg(a: &[Arg]) -> R<Option<f64>> {
-    if has(a, 1) { Ok(Some(num(a, 1)?)) } else { Ok(None) }
+    if !has(a, 1) {
+        return Ok(None);
+    }
+    if matches!(a.get(1).map(scalar), Some(Value::Bool(_))) {
+        return Err(CellError::Value);
+    }
+    Ok(Some(num(a, 1)?))
 }
 
 fn convert_base(a: &[Arg], from: u32, to: u32) -> R<Value> {
@@ -402,6 +412,12 @@ mod tests {
         is_text(ev("BIN2OCT", vec![n(1111111111.0)]), "7777777777");
         is_text(ev("DEC2BIN", vec![n(9.0), n(4.0)]), "1001");
         is_text(ev("DEC2BIN", vec![n(-100.0)]), "1110011100");
+        is_err(ev("DEC2BIN", vec![n(-1.0), n(0.0)]), CellError::Num);
+        is_err(ev("DEC2HEX", vec![n(-1.0), n(11.0)]), CellError::Num);
+        is_err(ev("DEC2OCT", vec![n(-1.0), n(-1.0)]), CellError::Num);
+        is_err(ev("DEC2BIN", vec![n(1.0), crate::Arg::val(Value::Bool(true))]), CellError::Value);
+        is_text(ev("DEC2BIN", vec![n(-1.0), n(1.0)]), "1111111111");
+        is_text(ev("DEC2HEX", vec![n(-1.0), n(10.0)]), "FFFFFFFFFF");
         is_err(ev("DEC2BIN", vec![n(512.0)]), CellError::Num);
         is_text(ev("DEC2HEX", vec![n(100.0), n(4.0)]), "0064");
         is_text(ev("DEC2HEX", vec![n(-54.0)]), "FFFFFFFFCA");
