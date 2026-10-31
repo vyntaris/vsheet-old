@@ -206,6 +206,9 @@ pub(super) fn tdist_legacy(a: &[Arg], _: C) -> R<Value> {
 pub(super) fn t_inv(a: &[Arg], _: C) -> R<Value> {
     let p = num(a, 0)?;
     let v = df_arg(a, 1)?;
+    if p == 0.0 {
+        return Err(CellError::Div0);
+    }
     if !(p > 0.0 && p < 1.0) {
         return Err(CellError::Num);
     }
