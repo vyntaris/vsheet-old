@@ -281,7 +281,11 @@ fn unichar(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     if !(1.0..=1_114_111.0).contains(&n) {
         return Err(CellError::Value);
     }
-    match char::from_u32(n as u32) {
+    let cp = n as u32;
+    if (0xFDD0..=0xFDEF).contains(&cp) || cp & 0xFFFE == 0xFFFE {
+        return Err(CellError::NA);
+    }
+    match char::from_u32(cp) {
         Some(c) => text_val(c.to_string()),
         None => Err(CellError::NA),
     }
@@ -1181,8 +1185,15 @@ mod tests {
         close(ev("CODE", vec![t("€")]), 128.0);
         is_err(ev("CODE", vec![t("")]), CellError::Value);
         is_text(ev("UNICHAR", vec![n(9731.0)]), "☃");
+        for cp in [0xFDD0, 0xFDEF, 0xFFFE, 0xFFFF, 0x1FFFE, 0x1FFFF, 0x10FFFE, 0x10FFFF] {
+            is_err(ev("UNICHAR", vec![n(f64::from(cp))]), CellError::NA);
+        }
+        for cp in [0xFDCF, 0xFDF0, 0xFFFD, 0x1FFFD] {
+            assert!(matches!(ev("UNICHAR", vec![n(f64::from(cp))]), Value::Text(_)));
+        }
         close(ev("UNICODE", vec![t("☃")]), 9731.0);
         is_err(ev("UNICHAR", vec![n(0.0)]), CellError::Value);
+        is_err(ev("UNICHAR", vec![n(1_114_112.0)]), CellError::Value);
         is_err(ev("UNICHAR", vec![n(55296.0)]), CellError::NA);
     }
 
