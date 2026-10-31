@@ -499,7 +499,7 @@ pub(super) fn gamma_dist(a: &[Arg], _: C) -> R<Value> {
         return if al < 1.0 {
             Err(CellError::Num)
         } else if al == 1.0 {
-            num_val(1.0 / be)
+            Err(CellError::Num)
         } else {
             num_val(0.0)
         };
