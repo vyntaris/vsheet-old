@@ -405,9 +405,9 @@ fn t_chi_f() {
 }
 
 #[test]
-fn t_dist_degrees_truncating_below_one_return_num() {
+fn t_dist_zero_degrees_error_depends_on_mode() {
     for df in [0.0, 0.9, -0.1] {
-        is_err(ev("T.DIST", vec![n(0.0), n(df), b(false)]), CellError::Num);
+        is_err(ev("T.DIST", vec![n(0.0), n(df), b(false)]), CellError::Div0);
         is_err(ev("T.DIST", vec![n(0.0), n(df), b(true)]), CellError::Num);
     }
     is_err(ev("T.DIST", vec![n(0.0), n(-1.0), b(false)]), CellError::Num);
