@@ -1261,9 +1261,9 @@ mod tests {
         is_err(ev("DOLLAR", vec![n(1e190), n(0.0)]), CellError::Value);
         assert!(matches!(ev("DOLLAR", vec![n(-1e188), n(0.0)]), Value::Text(ref s) if s.len() == 254));
         is_err(ev("DOLLAR", vec![n(-1e189), n(0.0)]), CellError::Value);
-        assert!(matches!(ev("DOLLAR", vec![n(1e187), n(2.0)]), Value::Text(ref s) if s.len() == 254));
-        is_err(ev("DOLLAR", vec![n(1e188), n(2.0)]), CellError::Value);
-        is_err(ev("DOLLAR", vec![n(-1e187), n(2.0)]), CellError::Value);
+        assert!(matches!(ev("DOLLAR", vec![n(1.23456789e187), n(2.0)]), Value::Text(ref s) if s.len() == 254));
+        is_err(ev("DOLLAR", vec![n(1.23456789e188), n(2.0)]), CellError::Value);
+        is_err(ev("DOLLAR", vec![n(-1.23456789e186), n(2.0)]), CellError::Value);
         assert!(matches!(ev("DOLLAR", vec![n(1e189), n(-1.0)]), Value::Text(ref s) if s.len() == 254));
         is_err(ev("DOLLAR", vec![n(1e190), n(-1.0)]), CellError::Value);
     }
