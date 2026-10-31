@@ -291,6 +291,20 @@ fn csv_named_history_does_not_get_the_reserved_sheet_name() {
     assert_eq!(wb.sheets[0].name, "Sales");
 }
 
+#[test]
+fn csv_and_text_open_read_day_first_dates_and_report_a_guessed_order() {
+    let may = vsheet_core::date::serial_from_ymd(vsheet_core::DateSystem::D1900, 2026, 5, 31).unwrap();
+    let april = vsheet_core::date::serial_from_ymd(vsheet_core::DateSystem::D1900, 2026, 4, 3).unwrap();
+    for file in ["dates.csv", "dates.txt"] {
+        let (wb, warnings) = open_bytes(file, b"When\n31/05/2026\n03/04/2026\n").unwrap();
+        assert_eq!(wb.sheet(0).unwrap().value(CellRef::new(1, 0)), vsheet_core::Value::Number(may), "{file}");
+        assert_eq!(wb.sheet(0).unwrap().value(CellRef::new(2, 0)), vsheet_core::Value::Number(april), "{file}");
+        assert!(warnings.is_empty(), "{file}: {warnings:?}");
+    }
+    let (_, warnings) = open_bytes("ambiguous.csv", b"When\n03/04/2026\n12/01/2026\n").unwrap();
+    assert!(warnings.iter().any(|w| w.contains("column A") && w.contains("ambiguous")), "{warnings:?}");
+}
+
 /// A save that can't be put in place (here a folder already has the workbook's name, as
 /// with a file another app holds locked) fails without leaving `<name>.sctmp` behind.
 #[cfg(not(target_arch = "wasm32"))]

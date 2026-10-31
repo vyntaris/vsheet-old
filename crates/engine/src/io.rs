@@ -182,17 +182,17 @@ fn read_plain(name: &str, bytes: &[u8], csv_as_text: bool) -> Result<(Workbook, 
         }
         Some(FileKind::Tsv) => {
             let opts = vsheet_xlsx::CsvOptions { delimiter: b'\t', parse_values: !csv_as_text, ..Default::default() };
-            let mut wb = vsheet_xlsx::read_csv(bytes, &opts).map_err(|e| EngineError::Other(e.to_string()))?;
+            let (mut wb, report) = vsheet_xlsx::read_csv_with_report(bytes, &opts).map_err(|e| EngineError::Other(e.to_string()))?;
             // Tab is what makes it a .tsv/.txt; saved as .csv it gets the CSV default.
             wb.csv_delimiter = None;
             rename_first_sheet(&mut wb, name);
-            Ok((wb, vec![]))
+            Ok((wb, report.warnings))
         }
         _ => {
             let opts = vsheet_xlsx::CsvOptions { delimiter: 0, parse_values: !csv_as_text, ..Default::default() };
-            let mut wb = vsheet_xlsx::read_csv(bytes, &opts).map_err(|e| EngineError::Other(e.to_string()))?;
+            let (mut wb, report) = vsheet_xlsx::read_csv_with_report(bytes, &opts).map_err(|e| EngineError::Other(e.to_string()))?;
             rename_first_sheet(&mut wb, name);
-            Ok((wb, vec![]))
+            Ok((wb, report.warnings))
         }
     }
 }
