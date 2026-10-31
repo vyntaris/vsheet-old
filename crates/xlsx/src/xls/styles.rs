@@ -225,6 +225,7 @@ fn color(icv: u16, table: &[u32; 64]) -> Color {
     }
 }
 
+/// A border line style from its BIFF8 code (dgLeft and the like); unknown codes are no border.
 fn border_style(dg: u32) -> BorderStyle {
     match dg {
         1 => BorderStyle::Thin,
@@ -244,6 +245,7 @@ fn border_style(dg: u32) -> BorderStyle {
     }
 }
 
+/// A fill pattern from its BIFF8 code (fls); unknown codes are no pattern.
 fn pattern(fls: u16) -> PatternType {
     match fls {
         0x01 => PatternType::Solid,
@@ -268,6 +270,7 @@ fn pattern(fls: u16) -> PatternType {
     }
 }
 
+/// One border side: its style and colour; a side without a style has no colour.
 fn line(dg: u32, icv: u32, table: &[u32; 64]) -> BorderLine {
     let style = border_style(dg);
     if style == BorderStyle::None {
@@ -288,6 +291,7 @@ fn xf_font(ifnt: u16, fonts: &[Font]) -> Font {
     fonts.get(i).or_else(|| fonts.first()).cloned().unwrap_or_default()
 }
 
+/// The number format an XF names: a custom format, else a built-in one, else General.
 fn num_fmt(ifmt: u16, formats: &HashMap<u16, String>) -> NumFmt {
     let code = formats.get(&ifmt).map(String::as_str).or_else(|| builtin_format(u32::from(ifmt))).unwrap_or("General");
     if code.eq_ignore_ascii_case("General") { NumFmt::default() } else { NumFmt::new(code) }
