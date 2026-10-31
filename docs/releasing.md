@@ -5,8 +5,7 @@ signed installers for macOS, Windows, Linux, FreeBSD and the web, then creates o
 **draft** GitHub Release named `VSheet v<version>`. Nobody sees a draft until a maintainer
 publishes it.
 
-This is VSheet's implementation of the shared [release playbook](release-playbook.md)
-(craftrules `release/playbook.md`), copied from DesignCraft and renamed. User-facing names say
+This process was copied from DesignCraft and renamed. User-facing names say
 **VSheet**. Files, binaries and ids stay lowercase
 (`vsheet-<version>-<platform>-<arch>.<ext>`, `ai.storyteller.vsheet`).
 
@@ -19,25 +18,24 @@ This is VSheet's implementation of the shared [release playbook](release-playboo
 | Web app dir `apps/vsheet-web` | `packaging/web/package.sh` |
 | App colour `#1f9d55` (ink `#147a40`), **proposed** | `assets/app-icon/README.md`, metainfo `<branding>` |
 
-## Prerequisites still owned by the app crates
+## Application release prerequisites
 
-The pipeline references crates that don't exist yet; the first release run fails until they do:
+The `apps/vsheet` and `apps/vsheet-web` crates are workspace members, and
+`apps/vsheet-cli` supports `--version`. The `cargo xtask` alias is defined in
+`.cargo/config.toml`. The current app-specific release setup includes:
 
-- **`apps/vsheet`** (the GUI binary `vsheet`) and **`apps/vsheet-web`** (trunk
-  site) must be workspace members. `apps/vsheet-cli` exists and supports `--version`.
-- **Windows resources:** move `packaging/windows/app-build.rs.in` to `apps/vsheet/build.rs`
-  and add `winresource = "0.1"` under `[build-dependencies]` (instructions at the top of the
-  file). `package.ps1` sets `VSHEET_REQUIRE_WINRES=1`, so a release build without the icon
-  fails, and it checks that `vsheet.exe` is a GUI-subsystem binary, so `main.rs` needs
-  `#![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]`.
-- **Build info:** CI exports `VSHEET_BUILD_SHA` and `VSHEET_BUILD_DATE`; read them
-  with `option_env!` (fallback: "dev build") for `--version` and *Help › About VSheet*.
-- **Runtime icon:** embed `assets/app-icon/vsheet-macos-512.png` (macOS Dock) and
+- **Windows resources:** `apps/vsheet/build.rs` embeds the icon and version information with
+  `winresource` (instructions at the top of the file). `package.ps1` sets
+  `VSHEET_REQUIRE_WINRES=1`, so a release build without the icon fails, and it checks that
+  `vsheet.exe` is a GUI-subsystem binary. `apps/vsheet/src/main.rs` sets
+  `windows_subsystem = "windows"` for release builds.
+- **Version information:** `vsheet --version`, `vsheet-cli --version` and the About dialog
+  use `env!("CARGO_PKG_VERSION")` from `[workspace.package]`. `packaging/env.sh` also exports
+  `VSHEET_BUILD_SHA` and `VSHEET_BUILD_DATE` for artifact metadata.
+- **Runtime icon:** `apps/vsheet/src/main.rs` embeds
+  `assets/app-icon/vsheet-macos-512.png` (macOS Dock) and
   `hicolor/256x256/apps/ai.storyteller.vsheet.png` (Windows/Linux) as the window icon, and
-  use `ai.storyteller.vsheet` as the Wayland app id / `StartupWMClass`.
-- **`cargo xtask` alias:** the docs use `cargo xtask …`, which needs
-  `.cargo/config.toml` with `[alias] xtask = "run --package xtask --"`. Until it exists, use
-  `cargo run -p xtask -- …`. The workflows already call `cargo run -p xtask` directly.
+  uses `ai.storyteller.vsheet` as the Wayland app id / `StartupWMClass`.
 
 ## Cutting a release
 
@@ -122,7 +120,9 @@ open dist/release/vsheet-*-macos-*.dmg
 is GUI, `vsheet-cli.exe` console), signs both executables, builds the MSI with WiX v5, signs
 the MSI, and zips a portable build.
 
-- `vsheet.wxs`: per-machine install into Program Files, advertised Start Menu shortcut, App
+- `vsheet.wxs`: a dual-scope package (per-user by default into
+  `%LOCALAPPDATA%\Programs\ArtCraft\VSheet`, per-machine into `Program Files\ArtCraft\VSheet` (`Program Files (x86)` for the 32-bit build),
+  see `packaging/windows/INSTALLATION.md`), advertised Start Menu shortcut, App
   Paths (Win+R `vsheet`). File types: ProgIds `VSheet.Workbook` (`.xlsx`, `.xlsm`) and
   `VSheet.TextData` (`.csv`, `.tsv`), listed under each extension's `OpenWithProgids` and
   in `Capabilities` + `RegisteredApplications`, so VSheet appears in *Open with* and
@@ -222,7 +222,7 @@ shows a `::warning::`. Never store these as org- or repo-level Actions secrets (
 
 `GITHUB_TOKEN` creates the release; only the final job gets `contents: write`.
 
-The exact commands (from craftrules `release/signing-setup.md`, steps 1–3), run by an org
+The repository setup commands, run by an org
 admin. Done for storytold/gridcraft on 2026-10-07; the `release-managers` team also has write
 access to the repo, which its ruleset bypass needs.
 
@@ -272,8 +272,7 @@ the publisher.
 ## Icons
 
 `assets/app-icon/vsheet.svg` is a **placeholder** (an original ledger-page drawing on
-VSheet green) until the owner makes VSheet's engraved creature portrait (craftrules
-`standards/icon-design.md`). `packaging/icons.sh` regenerates the 1024 px PNG, the macOS 512 px
+VSheet green) until the owner makes VSheet's engraved creature portrait. `packaging/icons.sh` regenerates the 1024 px PNG, the macOS 512 px
 PNG, the `.icns` (iconutil), the `.ico` (`cargo xtask ico`) and the hicolor PNGs from it; it
 needs `resvg`. The outputs are committed, so packaging never needs those tools. Every file has a
 row in `ATTRIBUTION.md` (`cargo xtask assets`).
@@ -287,7 +286,8 @@ row in `ATTRIBUTION.md` (`cargo xtask assets`).
   installs, runs and uninstalls the MSI on a Windows 11 ARM64 runner.
 - `.github/workflows/freebsd.yml`: FreeBSD build + tests (manual run from `release`).
 
-**Only the `release` branch builds.** No build workflow runs on `main` or pull requests; every
-build job checks `github.ref == 'refs/heads/release'`, so a manual run from another branch is
-skipped. Only `packaging-lint.yml` (no build, no secrets) runs on `main` and PRs.
+**CI and release builds.** `.github/workflows/ci.yml` runs the shared `cargo xtask ci` gate on
+every push to `main` and every pull request. Release artifacts are built on `release` pushes or
+manually; manual runs from other branches are dry runs as described above. `packaging-lint.yml`
+also runs on `main` and PRs.
 - Locally: `cargo xtask ci` (fmt, clippy, tests, assets, layers, wasm, parity check).
