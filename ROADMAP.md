@@ -296,5 +296,5 @@ Ranked; estimates in Opus 5.5 agent-hours. Detail and the full beta-gate list in
 | 2026-10-10 | minor | Readiness-by-audience table with hours to ~95% per audience; full number unchanged (additive weighted sum) |
 | 2026-10-10 | minor | Added Mainstream practitioner (~50%) and Essentials user (~63%); languages updated for the 10-10 merges (ribbon in ja, zh, ko, pt-BR, ru); localization 5%→10%; full number re-checked (51.6, unchanged) |
 | 2026-10-10 | minor | Checked against the alpha gate (six core workflows pass): stays alpha |
-| 2026-10-10 | major | Re-measured against Excel for Mac 16.113.4: stage alpha, breadth ~75%, ready ~50%, ~160–240 h to beta, ~700–1,100 h to full parity; restructured to the progress-docs standard; detail moved to `docs/` |
+| 2026-10-10 | major | Re-measured against Excel for Mac 16.113.4: stage alpha, breadth ~75%, ready ~50%, ~160–240 h to beta, ~700–1,100 h to full parity; progress docs restructured; detail moved to `docs/` |
 | 2026-10-07 | major | First estimates: catalog 89%, functions ~93%, depth ~65%, ~35 h to alpha, ~215 h to full parity |
