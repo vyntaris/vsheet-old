@@ -1401,6 +1401,17 @@ fn protection_refuses_edits_of_locked_cells() {
 }
 
 #[test]
+fn locked_cell_message_matches_what_an_edit_would_be_refused_with() {
+    let s = protected(json!({}));
+    let locked = CellRef::parse("A1").unwrap();
+    let unlocked = CellRef::parse("D1").unwrap();
+
+    assert!(s.locked_cell_message(0, locked).is_some_and(|m| m.contains("protected sheet")));
+    assert_eq!(s.locked_cell_message(0, unlocked), None, "an unlocked cell stays editable");
+    assert_eq!(s.locked_cell_message(9, locked), None, "no such sheet");
+}
+
+#[test]
 fn protection_allows_permitted_row_and_column_edits() {
     let mut s = protected(json!({"insertRows": true, "deleteRows": true, "insertColumns": true}));
     // Inserting shifts locked cells, which the protection allows.
