@@ -1188,8 +1188,8 @@ mod tests {
         for cp in [0xFDD0, 0xFDEF, 0xFFFE, 0xFFFF, 0x1FFFE, 0x1FFFF, 0x10FFFE, 0x10FFFF] {
             is_err(ev("UNICHAR", vec![n(f64::from(cp))]), CellError::NA);
         }
-        for cp in [0xFDCF, 0xFDF0, 0xFFFD, 0x1FFFD] {
-            assert!(matches!(ev("UNICHAR", vec![n(f64::from(cp))]), Value::Text(_)));
+        for (cp, expected) in [(0xFDCF, "\u{FDCF}"), (0xFDF0, "\u{FDF0}"), (0xFFFD, "\u{FFFD}"), (0x1FFFD, "\u{1FFFD}")] {
+            is_text(ev("UNICHAR", vec![n(f64::from(cp))]), expected);
         }
         close(ev("UNICODE", vec![t("☃")]), 9731.0);
         is_err(ev("UNICHAR", vec![n(0.0)]), CellError::Value);
