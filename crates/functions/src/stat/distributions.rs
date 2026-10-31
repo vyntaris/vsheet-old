@@ -629,6 +629,9 @@ pub(super) fn weibull_dist(a: &[Arg], _: C) -> R<Value> {
     if x < 0.0 || al <= 0.0 || be <= 0.0 {
         return Err(CellError::Num);
     }
+    if x == 0.0 {
+        return num_val(0.0);
+    }
     let t = (x / be).powf(al);
     num_val(if cum { -(-t).exp_m1() } else { al / be.powf(al) * x.powf(al - 1.0) * (-t).exp() })
 }
