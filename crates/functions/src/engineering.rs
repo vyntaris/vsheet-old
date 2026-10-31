@@ -25,7 +25,7 @@ fn base_source(a: &[Arg]) -> R<String> {
             Ok(number_to_text(n))
         }
         Value::Empty => Ok(String::new()),
-        v => Ok(v.to_text()?.trim().to_string()),
+        v => Ok(v.to_text()?.to_string()),
     }
 }
 
@@ -411,6 +411,21 @@ mod tests {
         is_text(ev("OCT2HEX", vec![n(100.0), n(4.0)]), "0040");
         is_text(ev("OCT2HEX", vec![n(7777777533.0)]), "FFFFFFFF5B");
         is_err(ev("BIN2DEC", vec![n(102.0)]), CellError::Num);
+        for (f, input) in [
+            ("BIN2DEC", " 10"),
+            ("BIN2DEC", "10 "),
+            ("BIN2DEC", "\t10"),
+            ("BIN2HEX", " 10"),
+            ("BIN2OCT", "10 "),
+            ("HEX2DEC", " 10"),
+            ("HEX2BIN", "10 "),
+            ("HEX2OCT", "\t10"),
+            ("OCT2DEC", " 10"),
+            ("OCT2BIN", "10 "),
+            ("OCT2HEX", "\t10"),
+        ] {
+            is_err(ev(f, vec![t(input)]), CellError::Num);
+        }
         is_err(ev("HEX2DEC", vec![t("GG")]), CellError::Num);
         is_err(ev("BIN2DEC", vec![t("11111111111")]), CellError::Num);
         is_err(ev("DEC2BIN", vec![t("abc")]), CellError::Value);
