@@ -55,6 +55,10 @@ fn f_upper(x: f64, d1: f64, d2: f64) -> f64 {
     if x <= 0.0 {
         return 1.0;
     }
+    if d1 >= 1e8 && d2 / d1 <= 1e-8 {
+        // With a much larger numerator degree, the scaled beta tail converges to a gamma tail.
+        return reg_gamma_p(d2 / 2.0, d2 / (2.0 * (x + d2 / d1)));
+    }
     reg_inc_beta(d2 / (d2 + d1 * x), d2 / 2.0, d1 / 2.0)
 }
 
