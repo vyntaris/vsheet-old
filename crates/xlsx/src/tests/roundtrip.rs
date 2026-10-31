@@ -1499,3 +1499,37 @@ fn a_partial_sheet_filter_is_not_folded_into_a_table() {
     assert!(t.filter.is_empty(), "the criteria landed on the wrong table column: {:?}", t.filter);
     assert!(b.autofilter.is_none(), "a sheet filter inside a table would be invalid");
 }
+
+#[test]
+fn workbook_view_settings_survive_a_round_trip() {
+    // #3057: a workbook Excel saved with the sheet tabs and both scroll bars hidden
+    // (and a non-default tab split) must open with those settings in the model and
+    // save with them still in the file.
+    let bytes = super::minimal(
+        "",
+        &[],
+        "",
+        "<bookViews><workbookView activeTab=\"0\" showSheetTabs=\"0\" showHorizontalScroll=\"0\" showVerticalScroll=\"0\" tabRatio=\"250\"/></bookViews>",
+    );
+    let (wb, _) = read_xlsx(&bytes).unwrap();
+    assert_eq!(
+        wb.view,
+        WorkbookView { show_sheet_tabs: false, show_horizontal_scroll: false, show_vertical_scroll: false, tab_ratio: 250 },
+        "the reader takes the view settings from <workbookView>"
+    );
+
+    let out = write_xlsx(&wb).unwrap();
+    let mut z = zip::ZipArchive::new(std::io::Cursor::new(out)).unwrap();
+    let mut xml = String::new();
+    z.by_name("xl/workbook.xml").unwrap().read_to_string(&mut xml).unwrap();
+    for attr in ["showSheetTabs=\"0\"", "showHorizontalScroll=\"0\"", "showVerticalScroll=\"0\"", "tabRatio=\"250\""] {
+        assert!(xml.contains(attr), "the writer keeps {attr} in {xml}");
+    }
+
+    // A workbook with the format's defaults writes the bare element it always has.
+    let plain = write_xlsx(&Workbook::new()).unwrap();
+    let mut z = zip::ZipArchive::new(std::io::Cursor::new(plain)).unwrap();
+    let mut xml = String::new();
+    z.by_name("xl/workbook.xml").unwrap().read_to_string(&mut xml).unwrap();
+    assert!(xml.contains("<workbookView activeTab=\"0\"/>"), "defaults stay unwritten: {xml}");
+}
