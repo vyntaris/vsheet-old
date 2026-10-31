@@ -263,6 +263,41 @@ fn insert_function_lets_tab_reach_the_category_list() {
     assert_eq!(listed(&h), before + 1, "the list is open");
 }
 
+#[test]
+fn enter_on_the_category_list_does_not_confirm_insert_function() {
+    use egui::accesskit::Role;
+    let mut h = formulas_tab(1440.0);
+    click(&mut h, "Insert Function");
+    h.run_steps(3);
+    let open = |h: &Harness| h.state().dialog.as_ref().is_some_and(|d| d.name == "insertFunction");
+    let listed = |h: &Harness| h.get_all_by_label("Date & Time").count();
+    let closed = listed(&h);
+    h.input_mut().events.extend([key_event(Key::Tab, true), key_event(Key::Tab, false)]);
+    h.run_steps(5);
+    assert!(h.get_by_role(Role::ComboBox).is_focused(), "Tab reaches the category list");
+    // Enter on the focused list opens it, as Space does; the dialog stays open and nothing is
+    // inserted.
+    h.input_mut().events.extend([key_event(Key::Enter, true), key_event(Key::Enter, false)]);
+    h.run_steps(3);
+    assert!(open(&h), "Enter on the category list leaves the dialog open");
+    assert_eq!(editor_text(&h), None, "no function is inserted");
+    assert_eq!(listed(&h), closed + 1, "Enter opens the list");
+    // Enter again, with the list open, closes it and still does not confirm.
+    h.input_mut().events.extend([key_event(Key::Enter, true), key_event(Key::Enter, false)]);
+    h.run_steps(3);
+    assert!(open(&h), "Enter in the open list leaves the dialog open");
+    assert_eq!(editor_text(&h), None);
+    // Back in the search box (Shift+Tab), Enter confirms as before.
+    let shift_tab = |pressed| Event::Key { key: Key::Tab, physical_key: None, pressed, repeat: false, modifiers: Modifiers::SHIFT };
+    h.input_mut().events.extend([shift_tab(true), shift_tab(false)]);
+    h.run_steps(3);
+    assert!(!h.get_by_role(Role::ComboBox).is_focused(), "Shift+Tab leaves the category list");
+    h.input_mut().events.extend([key_event(Key::Enter, true), key_event(Key::Enter, false)]);
+    h.run_steps(3);
+    assert!(!open(&h), "Enter in the search box confirms");
+    assert!(editor_text(&h).is_some_and(|t| t.starts_with('=') && t.ends_with('(')), "{:?}", editor_text(&h));
+}
+
 /// The text shapes the last frame painted, with their left edge and width.
 fn painted_text(h: &Harness) -> Vec<(String, f32, f32)> {
     let mut out = Vec::new();

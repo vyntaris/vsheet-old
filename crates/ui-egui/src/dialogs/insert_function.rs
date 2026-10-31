@@ -29,7 +29,10 @@ pub(super) fn insert_function(app: &mut SheetApp, ui: &mut egui::Ui, d: &mut Dia
     } else {
         lib::category_id(&saved).map(lib::category_label).unwrap_or(MOST_RECENTLY_USED).to_string()
     };
-    ui.horizontal(|ui| {
+    // The category list is the dialog's only menu, so a menu open as the frame starts is its own
+    // (Enter on a row picks it and closes the menu in this frame).
+    let menu_was_open = egui::Popup::is_any_open(ui.ctx());
+    let picker = ui.horizontal(|ui| {
         let label = ui.label(language.tr("Or select a category:"));
         craft_ui::ComboBox::from_id_salt("insertFunctionCategory")
             .width(220.0)
@@ -40,8 +43,14 @@ pub(super) fn insert_function(app: &mut SheetApp, ui: &mut egui::Ui, d: &mut Dia
                 }
             })
             .response
-            .labelled_by(label.id);
+            .labelled_by(label.id)
     });
+    // Enter on the category list or in its menu opens it or picks a category, as Space does
+    // (egui clicks a focused control on either key); it does not also confirm the dialog.
+    let picker = picker.inner;
+    if menu_was_open || picker.has_focus() || craft_ui::ComboBox::is_open(ui.ctx(), picker.id) {
+        ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Enter));
+    }
     if category != saved {
         d.list_index = 0;
     }
