@@ -26,7 +26,7 @@ fn t_pdf(t: f64, v: f64) -> f64 {
     } else {
         ln_gamma(z + 0.5) - ln_gamma(z)
     };
-    (log_gamma_ratio - 0.5 * (v * std::f64::consts::PI).ln() - (v + 1.0) / 2.0 * (1.0 + t * t / v).ln()).exp()
+    (log_gamma_ratio - 0.5 * (v * std::f64::consts::PI).ln() - (v + 1.0) / 2.0 * (t * t / v).ln_1p()).exp()
 }
 
 /// t ≥ 0 with P(T > t) = q, q in (0, 0.5].
