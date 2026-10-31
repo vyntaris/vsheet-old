@@ -375,7 +375,8 @@ pub(super) fn f_inv(a: &[Arg], _: C) -> R<Value> {
     if p == 0.0 {
         return num_val(0.0);
     }
-    num_val(invert(|x| f_cdf(x, d1, d2), p, 0.0, 1.0, 1e60))
+    let value = if p <= 0.5 { invert(|x| f_cdf(x, d1, d2), p, 0.0, 1.0, 1e60) } else { invert(|x| f_upper(x, d1, d2), 1.0 - p, 0.0, 1.0, 1e60) };
+    num_val(value)
 }
 
 pub(super) fn f_inv_rt(a: &[Arg], _: C) -> R<Value> {
