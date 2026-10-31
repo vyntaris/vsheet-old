@@ -106,7 +106,9 @@ fn escape_leaves_file_fields_before_closing_the_view() {
         h.run_steps(1);
         h.input_mut().events.push(egui::Event::Text("7".into()));
         h.run_steps(2);
-        if page_id != "print" {
+        if page_id == "print" {
+            assert_eq!(h.state().printing.settings.copies, 7, "Copies applies the entered value while editing");
+        } else {
             assert_eq!(h.get_by_role_and_label(Role::TextInput, label).value().as_deref(), Some("7"));
         }
         let copies = h.state().printing.settings.copies;
