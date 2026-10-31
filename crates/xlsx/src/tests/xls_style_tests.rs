@@ -40,6 +40,14 @@ fn font(twips: u16, flags: u16, icv: u16, weight: u16, script: u16, underline: u
     rec(0x0031, &p)
 }
 
+/// Sets the family and character-set bytes of a Font record built by `font` (after the 4-byte
+/// record header, 10 bytes of fields and the underline byte).
+fn with_family_charset(mut font_record: Vec<u8>, family: u8, charset: u8) -> Vec<u8> {
+    font_record[15] = family;
+    font_record[16] = charset;
+    font_record
+}
+
 /// The CellXF fields an XF record carries after ifnt, ifmt and the protection flags.
 #[derive(Clone, Copy, Default)]
 struct XfData {
@@ -268,6 +276,18 @@ fn reads_cell_style_and_xlsx_roundtrip(wb: &Workbook) {
     }
     assert_eq!(back.styles.get(StyleId::DEFAULT).font.name, "Arial");
     assert_eq!(back.cell_styles.iter().map(|(n, _)| n.as_str()).collect::<Vec<_>>(), ["Fancy"]);
+}
+
+#[test]
+fn font_family_and_charset_are_kept() {
+    let mut f = default_fonts();
+    // ifnt 5: family 3 (modern) and character set 0xEE (Eastern European).
+    f.push(with_family_charset(font(200, 0, 0x7FFF, 400, 0, 0, "Courier New"), 3, 0xEE));
+    f.push(xf(0, 0, STYLE, plain()));
+    f.push(xf(5, 0, CELL, plain()));
+    let (wb, _) = read_xls(&compound("Workbook", &workbook(&f, &[number(0, 0, 1, 1.0)]))).unwrap();
+    let s = style_at(&wb, "A1");
+    assert_eq!((s.font.name.as_str(), s.font.family, s.font.charset), ("Courier New", Some(3), Some(0xEE)));
 }
 
 #[test]
