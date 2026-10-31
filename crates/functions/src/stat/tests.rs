@@ -366,7 +366,7 @@ fn t_chi_f() {
     close_tol(ev("T.DIST.RT", vec![n(1.959999998), n(60.0)]), 0.027322465, D7);
     close_tol(ev("TDIST", vec![n(1.959999998), n(60.0), n(2.0)]), 0.054644930, D7);
     is_err(ev("TDIST", vec![n(-1.0), n(60.0), n(2.0)]), CellError::Num);
-    is_err(ev("T.DIST", vec![n(1.0), n(0.0), b(true)]), CellError::Div0);
+    is_err(ev("T.DIST", vec![n(1.0), n(0.0), b(true)]), CellError::Num);
     close_tol(ev("T.INV", vec![n(0.75), n(2.0)]), 0.8164966, D7);
     close_tol(ev("T.INV", vec![n(0.25), n(2.0)]), -0.8164966, D7);
     close_tol(ev("T.INV.2T", vec![n(0.546449), n(60.0)]), 0.606533, D7);
