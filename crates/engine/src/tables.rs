@@ -2,7 +2,7 @@
 //! `TableStyleLight1…21 / Medium1…28 / Dark1…11` names so files round-trip).
 
 use vsheet_core::{CellRef, RangeRef};
-use vsheet_model::*;
+use vsheet_model::{BorderLine, BorderStyle, Cell, Color, Fill, Formula, PatternType, Style, Table, Workbook};
 
 /// (family, number) from a style name, e.g. `TableStyleMedium2` → ("Medium", 2).
 pub fn parse_style_name(name: &str) -> (&'static str, u32) {
