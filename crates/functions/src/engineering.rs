@@ -185,6 +185,9 @@ fn bitxor(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
 fn shift(a: &[Arg], left: bool) -> R<Value> {
     let n = bit_operand(a, 0)?;
     let s = num(a, 1)?.trunc();
+    if n == 0 {
+        return Ok(Value::Number(0.0));
+    }
     if s.abs() > 53.0 {
         return Err(CellError::Num);
     }
@@ -477,6 +480,21 @@ mod tests {
         is_err(ev("BITAND", vec![n(1.5), n(5.0)]), CellError::Num);
         is_err(ev("BITLSHIFT", vec![n(1.0), n(54.0)]), CellError::Num);
         is_err(ev("BITLSHIFT", vec![n(2f64.powi(47)), n(1.0)]), CellError::Num);
+        for f in ["BITLSHIFT", "BITRSHIFT"] {
+            for shift in [-100.0, -54.0, -53.0, 53.0, 54.0, 100.0] {
+                close(ev(f, vec![n(0.0), n(shift)]), 0.0);
+            }
+            for shift in [-100.0, -54.0, 54.0, 100.0] {
+                is_err(ev(f, vec![n(1.0), n(shift)]), CellError::Num);
+            }
+            if f == "BITLSHIFT" {
+                is_err(ev(f, vec![n(1.0), n(53.0)]), CellError::Num);
+            } else {
+                close(ev(f, vec![n(1.0), n(53.0)]), 0.0);
+            }
+            is_err(ev(f, vec![n(0.0), t("bad")]), CellError::Value);
+        }
+        is_err(ev("BITRSHIFT", vec![n(-1.0), n(100.0)]), CellError::Num);
     }
 
     #[test]
