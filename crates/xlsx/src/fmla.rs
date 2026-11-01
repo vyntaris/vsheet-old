@@ -140,12 +140,83 @@ fn strip_param_prefix(n: String) -> String {
 pub fn from_file(text: &str) -> String {
     let body = text.strip_prefix('=').unwrap_or(text);
     match vsheet_formula::parse(body) {
-        Ok(e) => vsheet_formula::print(&e.map(&mut |x| match x {
-            Expr::Name(n) => Expr::Name(strip_param_prefix(n)),
-            Expr::Call(n, args) => Expr::Call(strip_param_prefix(n), args),
-            other => other,
-        })),
+        Ok(e) => {
+            let e = unwrap_dummy_functions(e);
+            vsheet_formula::print(&e.map(&mut |x| match x {
+                Expr::Name(n) => Expr::Name(strip_param_prefix(n)),
+                Expr::Call(n, args) => Expr::Call(strip_param_prefix(n), args),
+                other => other,
+            }))
+        }
         Err(_) => body.to_string(),
+    }
+}
+
+/// The function Google Sheets' XLSX export wraps formulas in when it thinks Excel lacks one of
+/// their functions.
+const DUMMY_FUNCTION: &str = "__xludf.DUMMYFUNCTION";
+
+/// The original formula inside Google Sheets' export wrapper
+/// `IFERROR(__xludf.DUMMYFUNCTION("<formula, quotes doubled>"),<cached value>)`, if `e` is that
+/// wrapper and the text parses. The parser has already undone the doubled quotes. The cached value
+/// is also the cell's `<v>`, which the reader keeps as the cell's value.
+fn dummy_function_inner(e: &Expr) -> Option<Expr> {
+    let Expr::Call(name, args) = e else { return None };
+    // The parser has already dropped an `_xlfn.` prefix from IFERROR.
+    if !name.eq_ignore_ascii_case("IFERROR") {
+        return None;
+    }
+    let [Expr::Call(dummy, inner), _fallback] = args.as_slice() else { return None };
+    if !dummy.eq_ignore_ascii_case(DUMMY_FUNCTION) {
+        return None;
+    }
+    let [Expr::Text(src)] = inner.as_slice() else { return None };
+    // The text came out of a formula within the length limit, so it is within it too; check
+    // anyway rather than rely on that.
+    if src.len() > vsheet_formula::MAX_FORMULA_LEN && src.chars().count() > vsheet_formula::MAX_FORMULA_LEN {
+        return None;
+    }
+    vsheet_formula::parse(src).ok()
+}
+
+/// Replaces each Google Sheets export wrapper (see [`dummy_function_inner`]) with the formula it
+/// holds, for the whole formula or anywhere inside it. One level only: wrappers in the unwrapped
+/// text stay as they are, so the work is bounded by the formula's length. If the result no longer
+/// parses (nesting beyond the parser's limit), the formula is kept as the file had it.
+fn unwrap_dummy_functions(e: Expr) -> Expr {
+    let mut found = false;
+    e.walk(&mut |x| {
+        found |= matches!(x, Expr::Call(n, _) if n.eq_ignore_ascii_case(DUMMY_FUNCTION));
+    });
+    if !found {
+        return e;
+    }
+    // The whole formula: no parentheses needed.
+    if let Some(inner) = dummy_function_inner(&e) {
+        return inner;
+    }
+    let original = e.clone();
+    let rewritten = e.map(&mut |x| match dummy_function_inner(&x) {
+        // The printer writes no parentheses of its own, so keep the inner formula's precedence
+        // with explicit ones unless it is a single operand.
+        Some(
+            inner @ (Expr::Call(..)
+            | Expr::Ref(_)
+            | Expr::Name(_)
+            | Expr::Number(_)
+            | Expr::Text(_)
+            | Expr::Bool(_)
+            | Expr::Error(_)
+            | Expr::Paren(_)
+            | Expr::Array(_)
+            | Expr::Struct(_)),
+        ) => inner,
+        Some(inner) => Expr::Paren(Box::new(inner)),
+        None => x,
+    });
+    match vsheet_formula::parse(&vsheet_formula::print(&rewritten)) {
+        Ok(_) => rewritten,
+        Err(_) => original,
     }
 }
 
@@ -282,6 +353,59 @@ mod tests {
         assert_eq!(text_to_file("=IFS(A1>0,1)"), "_xlfn.IFS(A1>0,1)");
         assert_eq!(to_file(&Formula::new("REGEXTEST(A1,\"x\")&ENCODEURL(B1)")), "_xlfn.REGEXTEST(A1,\"x\")&_xlfn.ENCODEURL(B1)");
         assert_eq!(to_file(&Formula::new("GROUPBY(A1:A3,B1:B3,\"SUM\")")), "_xlfn.GROUPBY(A1:A3,B1:B3,\"SUM\")");
+    }
+
+    /// #2871: Google Sheets' export wraps formulas as
+    /// `IFERROR(__xludf.DUMMYFUNCTION("<formula>"),<cached value>)`.
+    #[test]
+    fn google_sheets_dummy_function_wrapper() {
+        // The issue's formula, with its embedded newlines and doubled quotes.
+        let file = "IFERROR(__xludf.DUMMYFUNCTION(\"MAX(\n IFERROR(MAX(FILTER(ROW(C:C), C:C=\"\"שולם\"\")), 0),\n IFERROR(MAX(FILTER(ROW(D:D), D:D=\"\"שולם\"\")), 0)\n)\"),40)";
+        let want = "MAX(IFERROR(MAX(FILTER(ROW(C:C),C:C=\"שולם\")),0),IFERROR(MAX(FILTER(ROW(D:D),D:D=\"שולם\")),0))";
+        assert_eq!(from_file(file), want);
+        assert_eq!(from_file(&format!("={file}")), want);
+        // Any case, and IFERROR with its `_xlfn.` prefix.
+        assert_eq!(from_file("_xlfn.IFERROR(__XLUDF.dummyFunction(\"A1&\"\"x\"\"\"),\"1x\")"), "A1&\"x\"");
+        assert_eq!(from_file("iferror(__xludf.DUMMYFUNCTION(\"ARRAYFORMULA(A1:A3*2)\"),2)"), "ARRAYFORMULA(A1:A3*2)");
+        // Nested: an operator expression keeps its precedence; a call or operand needs no parentheses.
+        assert_eq!(from_file("1+IFERROR(__xludf.DUMMYFUNCTION(\"A1+2\"),5)*3"), "1+(A1+2)*3");
+        assert_eq!(from_file("SUM(IFERROR(__xludf.DUMMYFUNCTION(\"FILTER(A1:A3,B1:B3)\"),0),B1)"), "SUM(FILTER(A1:A3,B1:B3),B1)");
+        assert_eq!(from_file("IFERROR(__xludf.DUMMYFUNCTION(\"A1\"),0)&IFERROR(__xludf.DUMMYFUNCTION(\"-B1\"),0)"), "A1&(-B1)");
+        // One level only: a wrapper inside the unwrapped text stays.
+        assert_eq!(
+            from_file("IFERROR(__xludf.DUMMYFUNCTION(\"IFERROR(__xludf.DUMMYFUNCTION(\"\"A1\"\"),0)\"),0)"),
+            "IFERROR(__XLUDF.DUMMYFUNCTION(\"A1\"),0)"
+        );
+    }
+
+    /// Text that doesn't parse, and shapes that aren't exactly the wrapper, are kept as they were.
+    #[test]
+    fn google_sheets_dummy_function_kept_when_not_the_wrapper() {
+        for file in [
+            "IFERROR(__xludf.DUMMYFUNCTION(\"SUM(\"),5)",
+            "IFERROR(__xludf.DUMMYFUNCTION(\"1+\"),5)+1",
+            "IFERROR(__xludf.DUMMYFUNCTION(A1),5)",
+            "IFERROR(__xludf.DUMMYFUNCTION(\"A1\",\"B1\"),5)",
+            "IFERROR(__xludf.DUMMYFUNCTION(\"A1\"))",
+            "IFERROR(__xludf.DUMMYFUNCTION(\"A1\"),5,6)",
+            "IFNA(__xludf.DUMMYFUNCTION(\"A1\"),5)",
+            "IFERROR(_xludf.DUMMYFUNCTION(\"A1\"),5)",
+            "__xludf.DUMMYFUNCTION(\"A1\")",
+        ] {
+            let kept = vsheet_formula::print(&vsheet_formula::parse(file).unwrap());
+            assert_eq!(from_file(file), kept, "{file}");
+        }
+        // Inner text over the formula length limit.
+        let long = format!("IFERROR(__xludf.DUMMYFUNCTION(\"{}\"),5)", "1".repeat(vsheet_formula::MAX_FORMULA_LEN + 1));
+        assert!(from_file(&long).contains("DUMMYFUNCTION"));
+        // Nesting that would go past the parser's depth limit once unwrapped is kept as well.
+        let deep = |n: usize, mid: &str| format!("{}{mid}{}", "(".repeat(n), ")".repeat(n));
+        let inner = deep(200, "1").replace('"', "\"\"");
+        let file = deep(200, &format!("1+IFERROR(__xludf.DUMMYFUNCTION(\"{inner}\"),5)"));
+        assert!(vsheet_formula::parse(&file).is_ok());
+        let read = from_file(&file);
+        assert!(read.contains("DUMMYFUNCTION"));
+        assert!(vsheet_formula::parse(&read).is_ok());
     }
 
     #[test]
