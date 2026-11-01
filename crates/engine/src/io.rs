@@ -153,7 +153,8 @@ fn read_plain(name: &str, bytes: &[u8], csv_as_text: bool) -> Result<(Workbook, 
     }
     // Text named `.xlsx` is read as text.
     if sniffed == vsheet_xlsx::Format::Xlsx || (kind == Some(FileKind::Xlsx) && sniffed != vsheet_xlsx::Format::Csv) {
-        let (wb, report) = vsheet_xlsx::read_xlsx(bytes).map_err(|e| {
+        // Google Sheets' export wrapper is read as the formula inside when VSheet calculates it (#2871).
+        let (wb, report) = vsheet_xlsx::read_xlsx_with(bytes, &vsheet_calc::is_known_function).map_err(|e| {
             EngineError::Other(match (&e, vsheet_xlsx::oversized_part(bytes)) {
                 (vsheet_xlsx::IoError::TooLarge(_), Some((part, size))) => part_too_large_message(name, &part, size),
                 _ => format!("We can't open '{name}': {e}"),
