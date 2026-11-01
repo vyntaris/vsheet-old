@@ -2769,7 +2769,7 @@ fn keytip_q_() {
 
 #[test]
 fn generated_test_count_matches_the_table() {
-    const EXPECTED: usize = 366;
+    const EXPECTED: usize = 367;
     assert_eq!(vsheet_ui_egui::keytips::keytip_table::SEQUENCES.len(), EXPECTED);
 }
 
