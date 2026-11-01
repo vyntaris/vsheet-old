@@ -92,6 +92,25 @@ pub fn item_letter(prefix: &str, target: &str) -> Option<&'static str> {
     sequences_for(target).into_iter().find(|seq| seq.len() == prefix.len() + 1 && seq.starts_with(prefix))
 }
 
+/// True when `prefix` is the group level of a menu control: some of `target`'s sequences finish
+/// one key below it (Borders' "HB" before HBA..HBW). The menu opens there, as Excel's does, so its
+/// item letters show.
+pub fn opens_menu(prefix: &str, target: &str) -> bool {
+    !prefix.is_empty() && is_group_level(prefix) && sequences_for(target).iter().any(|seq| seq.len() == prefix.len() + 1 && seq.starts_with(prefix))
+}
+
+/// The badge for a menu item that runs `target` with `params` (compact JSON, as `keytips.json`
+/// writes it): its finish sequence one key below the prefix. Items sharing one command (the
+/// Borders presets) are told apart by their params.
+pub fn item_letter_with(prefix: &str, target: &str, params: &str) -> Option<&'static str> {
+    SEQUENCES.iter().find_map(|(seq, entry)| match entry {
+        Entry::Finish(Action::CommandWith(id, p)) if *id == target && *p == params && seq.len() == prefix.len() + 1 && seq.starts_with(prefix) => {
+            Some(*seq)
+        }
+        _ => None,
+    })
+}
+
 /// Badge sequences for a command control: every sequence for `target` that continues from the
 /// current prefix (the painter strips the prefix, so the remaining letters show).
 pub fn control_badges(prefix: &str, target: &str) -> Vec<&'static str> {
@@ -195,6 +214,16 @@ mod tests {
         assert_eq!(group_extension("H", &["dialog:pasteSpecial"]), vec!["HV"]);
         assert!(group_extension("", &["dialog:pasteSpecial"]).is_empty(), "tab letters paint on tabs, not buttons");
         assert!(group_extension("E", &["dialog:pasteSpecial"]).is_empty(), "the finish letter paints on the menu item");
+    }
+
+    #[test]
+    fn menu_levels_and_item_letters_with_params() {
+        assert!(opens_menu("HB", "home.borders"));
+        assert!(!opens_menu("H", "home.borders"), "the tab level shows the HB badge, not the menu");
+        assert!(!opens_menu("", "home.borders"));
+        assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"all\"}"), Some("HBA"));
+        assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"bottom\"}"), Some("HBO"));
+        assert_eq!(item_letter_with("H", "home.borders", "{\"preset\":\"all\"}"), None);
     }
 
     #[test]
