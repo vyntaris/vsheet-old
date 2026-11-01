@@ -1,0 +1,150 @@
+{
+  "id": "vsheet",
+  "name": "VSheet",
+  "upgradeCode": "5511327B-F305-41BE-92D0-EB84944E7C4D",
+  "sources": [
+    "vsheet.wxs"
+  ],
+  "icon": "assets/app-icon/vsheet.ico",
+  "localization": [],
+  "extensions": [],
+  "payloads": [
+    "vsheet-cli.exe",
+    "vsheet.exe"
+  ],
+  "registry": [
+    [
+      "-1",
+      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\vsheet.exe",
+      "",
+      "[#VsheetExe]"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.Workbook",
+      "",
+      "VSheet Workbook"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.Workbook\\DefaultIcon",
+      "",
+      "\"[#VsheetExe]\",0"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.Workbook\\shell\\open\\command",
+      "",
+      "\"[#VsheetExe]\" \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.TextData",
+      "",
+      "VSheet Text Data"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.TextData\\DefaultIcon",
+      "",
+      "\"[#VsheetExe]\",0"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\VSheet.TextData\\shell\\open\\command",
+      "",
+      "\"[#VsheetExe]\" \"%1\""
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.xlsx\\OpenWithProgids",
+      "VSheet.Workbook",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.xlsm\\OpenWithProgids",
+      "VSheet.Workbook",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.xlsb\\OpenWithProgids",
+      "VSheet.Workbook",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.ods\\OpenWithProgids",
+      "VSheet.Workbook",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.csv\\OpenWithProgids",
+      "VSheet.TextData",
+      "VSheet.TextData"
+    ],
+    [
+      "-1",
+      "Software\\Classes\\.tsv\\OpenWithProgids",
+      "VSheet.TextData",
+      "VSheet.TextData"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities",
+      "ApplicationName",
+      "VSheet"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities",
+      "ApplicationDescription",
+      "Open-source spreadsheet for .xlsx, CSV and TSV files"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities\\FileAssociations",
+      ".xlsx",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities\\FileAssociations",
+      ".xlsm",
+      "VSheet.Workbook"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities\\FileAssociations",
+      ".csv",
+      "VSheet.TextData"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Capabilities\\FileAssociations",
+      ".tsv",
+      "VSheet.TextData"
+    ],
+    [
+      "-1",
+      "Software\\RegisteredApplications",
+      "VSheet",
+      "Software\\VSheet\\Capabilities"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Installer",
+      "DesktopShortcut",
+      "[DESKTOPSHORTCUT]"
+    ],
+    [
+      "-1",
+      "Software\\VSheet\\Installer",
+      "DesktopShortcutComponent",
+      "#1"
+    ]
+  ],
+  "mode": "dualScope"
+}
