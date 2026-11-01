@@ -34,6 +34,9 @@ pub struct Ctx<'a> {
     pub cell_pictures: Vec<Option<Arc<CellPicture>>>,
     /// x14 conditional-format ids of the current sheet's data bars, with the index of the rule in `cond_formats`.
     pub cf_ext_ids: Vec<(String, usize)>,
+    /// Whether VSheet calculates a function, when the caller says: cell formulas wrapped by
+    /// Google Sheets' export are then read as the formula inside (see [`crate::read_xlsx_with`]).
+    pub known_function: Option<&'a dyn Fn(&str) -> bool>,
 }
 
 impl Ctx<'_> {
@@ -230,7 +233,7 @@ fn selected_workbook_view(workbook: &El) -> Option<&El> {
     views.kids("workbookView").find(|view| view.attr("visibility").unwrap_or("visible") == "visible").or_else(|| views.child("workbookView"))
 }
 
-pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
+pub fn read_xlsx<'a>(bytes: &'a [u8], known_function: Option<&'a dyn Fn(&str) -> bool>) -> Result<(Workbook, ReadReport), IoError> {
     let pkg = Package::open(bytes)?;
     let mut cx = Ctx {
         pkg,
@@ -247,6 +250,7 @@ pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
         num_fmts: Default::default(),
         cell_pictures: vec![],
         cf_ext_ids: vec![],
+        known_function,
     };
     let root_rels = cx.pkg.rels("")?;
     let wb_part = find_rel(&root_rels, "officeDocument").map(|r| r.target.clone()).unwrap_or_else(|| "xl/workbook.xml".into());

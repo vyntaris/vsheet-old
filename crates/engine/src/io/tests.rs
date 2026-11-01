@@ -575,3 +575,32 @@ fn content_wins_over_a_mismatched_extension() {
         assert_eq!(opened.sheet(0).unwrap().value(CellRef::new(0, 1)), vsheet_core::Value::text("b"), "{name}");
     }
 }
+
+/// #2871: opening an XLSX reads Google Sheets' `IFERROR(__xludf.DUMMYFUNCTION("…"),cached)`
+/// wrapper as the formula inside when VSheet calculates every function it calls (including
+/// the evaluator's own, such as ROW), and keeps the wrapper, and so the cached value, for a
+/// Google-only function.
+#[test]
+fn opening_google_sheets_export_unwraps_only_formulas_vsheet_calculates() {
+    use vsheet_core::{CellRef, Value};
+    let mut wb = Workbook::new();
+    let sh = std::sync::Arc::make_mut(&mut wb.sheets[0]);
+    let wrapped = [
+        ("A1", "IFERROR(__xludf.DUMMYFUNCTION(\"SUM(ROW(B1:B3))\"),6)", Value::Number(6.0)),
+        ("A2", "IFERROR(__xludf.DUMMYFUNCTION(\"GOOGLETRANSLATE(\"\"hi\"\",\"\"en\"\",\"\"fr\"\")\"),\"salut\")", Value::text("salut")),
+    ];
+    for (at, text, value) in &wrapped {
+        let cell = vsheet_model::Cell {
+            value: value.clone(),
+            formula: Some(std::sync::Arc::new(vsheet_model::Formula::new(text))),
+            ..Default::default()
+        };
+        sh.cells.set(CellRef::parse(at).unwrap(), cell);
+    }
+    let bytes = vsheet_xlsx::write_xlsx(&wb).unwrap();
+    let (opened, _) = open_bytes("google.xlsx", &bytes).unwrap();
+    let text = |at: &str| opened.sheets[0].cells.get(CellRef::parse(at).unwrap()).and_then(|c| c.formula.as_ref()).map(|f| f.text.clone());
+    assert_eq!(text("A1").as_deref(), Some("SUM(ROW(B1:B3))"));
+    assert_eq!(text("A2").as_deref(), Some("IFERROR(__XLUDF.DUMMYFUNCTION(\"GOOGLETRANSLATE(\"\"hi\"\",\"\"en\"\",\"\"fr\"\")\"),\"salut\")"));
+    assert_eq!(opened.sheets[0].cells.get(CellRef::parse("A2").unwrap()).map(|c| c.value.clone()), Some(Value::text("salut")));
+}
