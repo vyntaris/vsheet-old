@@ -245,8 +245,8 @@ pub(super) fn range_set_values(s: &mut Session, p: &Json) -> Result<Json> {
                         if text.is_empty() {
                             // An empty string clears the cell, as `null` and the default path do:
                             // an empty text cell is not blank, and a script clearing cells with
-                            // `""` would leave cells `COUNTA` counts.
-                            None
+                            // `""` would leave cells `COUNTA` counts. The cell keeps its formatting.
+                            input_to_cell("", sheet, at, &mut cx.wb)?
                         } else {
                             let mut style = cx.wb.sheet(sheet).map(|sh| sh.style_id(at)).unwrap_or_default();
                             // Line breaks still turn on Wrap Text, as typed input does.

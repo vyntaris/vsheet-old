@@ -225,10 +225,14 @@ fn set_values_parse_false_clears_an_empty_string() {
     let mut s = Session::new();
     s.new_workbook();
     s.execute("range.setValues", json!({"range": "A1:B1", "values": [["keep", "keep"]]})).unwrap();
+    s.execute("home.bold", json!({"range": "A1"})).unwrap();
     s.execute("range.setValues", json!({"range": "A1", "parse": false, "values": [["", ""]]})).unwrap();
     let get = |s: &mut Session, a: &str| s.execute("cell.get", json!({"cell": a})).unwrap();
     assert_eq!(get(&mut s, "A1")["type"], "empty");
     assert_eq!(get(&mut s, "B1")["type"], "empty");
+    let d = s.doc().unwrap();
+    let sh = d.wb.sheet(0).unwrap();
+    assert!(d.wb.styles.get(sh.style_id(CellRef::parse("A1").unwrap())).font.bold, "clearing with \"\" keeps the formatting");
     assert_eq!(s.execute("formulas.evaluate", json!({"formula": "=COUNTA(A1:B1)"})).unwrap(), json!(0.0));
 }
 
