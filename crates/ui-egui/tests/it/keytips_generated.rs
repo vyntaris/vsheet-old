@@ -339,6 +339,13 @@ fn keytip_hbi_() {
 }
 
 #[test]
+fn keytip_hbj_() {
+    let mut h = harness(blank());
+    sequence(&mut h, "HBJ", false);
+    assert!(h.state().session.journal.iter().any(|(id, _)| id == "home.borders"), "HBJ must journal home.borders");
+}
+
+#[test]
 fn keytip_hbl_() {
     let mut h = harness(blank());
     sequence(&mut h, "HBL", false);
