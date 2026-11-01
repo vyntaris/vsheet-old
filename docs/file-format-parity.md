@@ -1,6 +1,6 @@
 # File-format parity
 
-> **Last reviewed:** 2026-10-11 · **Last updated:** 2026-10-31 · **Change:** minor (`file.exportCsv {values: true}` writes raw values for automation; .xls dialog sheets are skipped instead of read as worksheets; `.xls` import reads each sheet's display options from WINDOW2: right-to-left, gridlines, headings, zeros, formulas; XLSX text boxes and shapes keep their paragraphs' right-to-left direction on save; CSV/TSV/TXT can open with every field kept as text via `file.open {csvAsText}`; formulas over Excel's 8,192 characters, and `%` or call chains past the nesting limit, are parse errors instead of stack overflows when a file is opened; XLSX PivotTables read and write `rowGrandTotals`/`colGrandTotals` the way Excel does, so a table saved with only one grand total opens with the right one; HTML export keeps right-to-left; CSV and text import detects likely Windows-1256 Arabic when invalid UTF-8 has Arabic byte runs; other invalid UTF-8 remains Windows-1252; HTML export places pictures and charts, as inline SVG, at their anchors; CSV and text open detects each column's date order from values that read only one way, warns when every date is ambiguous, and keeps a column with both kinds as text (#2765); earlier: `.xls` import reads cell formatting: fonts, fills, borders, alignment, protection, palette, user cell styles; `file.exportCsv {values: true}` writes raw values for automation; .xls dialog sheets are skipped instead of read as worksheets; `.xls` import reads each sheet's display options from WINDOW2: right-to-left, gridlines, headings, zeros, formulas; XLSX text boxes and shapes keep their paragraphs' right-to-left direction on save; CSV/TSV/TXT can open with every field kept as text via `file.open {csvAsText}`; formulas over Excel's 8,192 characters, and `%` or call chains past the nesting limit, are parse errors instead of stack overflows when a file is opened; XLSX PivotTables read and write `rowGrandTotals`/`colGrandTotals` the way Excel does, so a table saved with only one grand total opens with the right one; HTML export keeps right-to-left; CSV and text import detects likely Windows-1256 Arabic when invalid UTF-8 has Arabic byte runs; other invalid UTF-8 remains Windows-1252; HTML export places pictures and charts, as inline SVG, at their anchors) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
+> **Last reviewed:** 2026-11-01 · **Last updated:** 2026-11-01 · **Change:** trivial (XLSX workbook-view selection, normalized tab ratios and sheet-edit regressions; fidelity estimates unchanged; earlier: `file.exportCsv {values: true}` writes raw values for automation; .xls dialog sheets are skipped instead of read as worksheets; `.xls` import reads each sheet's display options from WINDOW2: right-to-left, gridlines, headings, zeros, formulas; XLSX text boxes and shapes keep their paragraphs' right-to-left direction on save; CSV/TSV/TXT can open with every field kept as text via `file.open {csvAsText}`; formulas over Excel's 8,192 characters, and `%` or call chains past the nesting limit, are parse errors instead of stack overflows when a file is opened; XLSX PivotTables read and write `rowGrandTotals`/`colGrandTotals` the way Excel does, so a table saved with only one grand total opens with the right one; HTML export keeps right-to-left; CSV and text import detects likely Windows-1256 Arabic when invalid UTF-8 has Arabic byte runs; other invalid UTF-8 remains Windows-1252; HTML export places pictures and charts, as inline SVG, at their anchors; CSV and text open detects each column's date order from values that read only one way, warns when every date is ambiguous, and keeps a column with both kinds as text (#2765)) · **Target:** Microsoft Excel (Microsoft 365), Excel for Mac 16.113.4
 
 Every format Excel opens or saves, with VSheet's read and write support, fidelity and tests.
 Part of [target-app-parity.md](target-app-parity.md). **File formats: ~50% ready, 80–120 h**
@@ -13,6 +13,27 @@ support comes from `crates/engine/src/io.rs` (`FileKind`), `crates/xlsx/src` and
 
 Legacy scalar `INDEX(range, MATCH(...))` formulas remain ordinary formulas on save, including when
 shared formulas are expanded during import (`array_export.rs`, #1505).
+
+## Workbook window settings
+
+VSheet keeps one modelled workbook window. On XLSX import it selects the first visible
+`workbookView` (omitted `visibility` means visible), or the first view when none is visible.
+The active tab and display options come from that same view and survive the next save.
+VSheet normalizes `tabRatio` to 0–1000 on import and export; malformed or overflowing
+unsigned-integer text uses the default 600. The valid endpoints 0 and 1000 survive, and
+600 plus the default shown flags stay omitted from output. Synthetic regressions in
+`crates/xlsx/src/tests/roundtrip.rs` cover each attribute independently, selection, fallback
+and round trips (#3057). Engine regressions exercise real sheet deletion and reordering
+commands and check that the saved active tab identifies the current sheet after reopening,
+with the workbook display options preserved.
+The format's [workbook-view defaults](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.workbookview?view=openxml-3.0.1)
+include visible windows and a tab ratio of 600. UI controls and rendering of these settings
+remain separate #3057 work.
+
+`firstSheet` records the leftmost visible tab, independently of `activeTab`. It is not modelled
+by this branch. Supporting it needs its own view state and sheet-edit handling, tracked in
+#2264; these regressions cover the active tab and existing display fields without introducing
+that separate feature.
 
 ## Workbook formats
 
@@ -110,6 +131,7 @@ refresh. Counted under features (Get & Transform, ~10% ready), not here.
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-11-01 | trivial | XLSX selects the first visible workbook view as one unit and bounds imported/exported tab ratios; isolated attributes and sheet-edit round trips covered, with firstSheet left to #2264 (#3057) |
 | 2026-10-31 | minor | CSV and text open detects each column's date order: a value that reads only day first (`31/05/2026`) makes the column day first, a value that reads only month first (`12/31/2026`) makes it month first, an all-ambiguous column keeps month first with a warning, and a column with both kinds stays text with a warning (#2765) |
 | 2026-10-21 | minor | HTML (Save as Web Page) writes pictures (`data:` URI `<img>`) and charts (inline SVG from the chart crate's drawing primitives, text included) at their anchors; the table uses the sheet's column widths and row heights when the sheet has either, and output for sheets without pictures or charts is unchanged |
 | 2026-10-20 | trivial | XLSX shared strings: Japanese phonetic runs (ふりがな, `<rPh sb="…" eb="…">` with `<phoneticPr>`) are read into the workbook and written back next to the string with the same text, so an open + save no longer deletes them; bad offsets and readings are dropped with a warning, a `<phoneticPr>` without runs is kept on its own, and when duplicate `<si>` items share a text but not a reading only the first reading is written (reported on open) (`phonetic_tests.rs`) |

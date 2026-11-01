@@ -3,7 +3,9 @@
 use std::sync::Arc;
 
 use vsheet_core::{DateSystem, RangeRef};
-use vsheet_model::{CalcMode, CellPicture, DefinedName, PhoneticString, Sheet, ShowObjects, Style, StyleId, StyleTable, Visibility, Workbook};
+use vsheet_model::{
+    CalcMode, CellPicture, DefinedName, PhoneticString, Sheet, ShowObjects, Style, StyleId, StyleTable, Visibility, Workbook, WorkbookView,
+};
 
 use crate::package::{Package, Rel};
 use crate::styles::{StylesIn, read_styles};
@@ -221,6 +223,13 @@ fn read_workbook_properties(cx: &mut Ctx<'_>, wb: &mut Workbook, xml: &El) {
     }
 }
 
+/// The single window modelled by VSheet: prefer the first visible window,
+/// including the format's default visibility, and otherwise retain the first one.
+fn selected_workbook_view(workbook: &El) -> Option<&El> {
+    let views = workbook.child("bookViews")?;
+    views.kids("workbookView").find(|view| view.attr("visibility").unwrap_or("visible") == "visible").or_else(|| views.child("workbookView"))
+}
+
 pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
     let pkg = Package::open(bytes)?;
     let mut cx = Ctx {
@@ -268,7 +277,19 @@ pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
     }
 
     read_workbook_properties(&mut cx, &mut wb, &wb_xml);
-    let active_tab = wb_xml.path(&["bookViews", "workbookView"]).and_then(|v| v.attr_u32("activeTab")).unwrap_or(0) as usize;
+    let view_el = selected_workbook_view(&wb_xml);
+    let active_tab = view_el.and_then(|v| v.attr_u32("activeTab")).unwrap_or(0) as usize;
+    if let Some(v) = view_el {
+        // The window's display settings (Excel's "Display options for this workbook").
+        // Absent attributes take the format's defaults, which is also what a workbook
+        // without a <workbookView> gets.
+        wb.view = WorkbookView {
+            show_sheet_tabs: v.flag("showSheetTabs", true),
+            show_horizontal_scroll: v.flag("showHorizontalScroll", true),
+            show_vertical_scroll: v.flag("showVerticalScroll", true),
+            tab_ratio: v.attr_u32("tabRatio").unwrap_or(600).min(WorkbookView::MAX_TAB_RATIO),
+        };
+    }
 
     // Sheets. `file_to_model[i]` maps the i-th <sheet> to a model sheet index.
     let mut file_to_model: Vec<Option<usize>> = vec![];
