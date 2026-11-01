@@ -180,7 +180,7 @@ pub(super) fn home(app: &mut SheetApp, ui: &mut Ui) {
                     ("Inside Borders", "inside"),
                 ] {
                     let item = crate::border_preview::preset_button(ui, label, preset);
-                    if let Some(sequence) = keytip_table::item_letter_with(&prefix, "home.borders", &json!({"preset": preset}).to_string()) {
+                    if let Some(sequence) = keytip_table::item_letter_with(&prefix, "home.borders", &json!({"preset": preset})) {
                         keytip(app, ui, sequence, egui::pos2(item.rect.right() - 10.0, item.rect.center().y));
                     }
                     if item.clicked() {

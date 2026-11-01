@@ -99,12 +99,17 @@ pub fn opens_menu(prefix: &str, target: &str) -> bool {
     !prefix.is_empty() && is_group_level(prefix) && sequences_for(target).iter().any(|seq| seq.len() == prefix.len() + 1 && seq.starts_with(prefix))
 }
 
-/// The badge for a menu item that runs `target` with `params` (compact JSON, as `keytips.json`
-/// writes it): its finish sequence one key below the prefix. Items sharing one command (the
-/// Borders presets) are told apart by their params.
-pub fn item_letter_with(prefix: &str, target: &str, params: &str) -> Option<&'static str> {
+/// The badge for a menu item that runs `target` with `params`: its finish sequence one key below
+/// the prefix. Items sharing one command (the Borders presets) are told apart by their params,
+/// compared as JSON values, so key order and spacing don't matter.
+pub fn item_letter_with(prefix: &str, target: &str, params: &serde_json::Value) -> Option<&'static str> {
     SEQUENCES.iter().find_map(|(seq, entry)| match entry {
-        Entry::Finish(Action::CommandWith(id, p)) if *id == target && *p == params && seq.len() == prefix.len() + 1 && seq.starts_with(prefix) => {
+        Entry::Finish(Action::CommandWith(id, p))
+            if *id == target
+                && seq.len() == prefix.len() + 1
+                && seq.starts_with(prefix)
+                && serde_json::from_str::<serde_json::Value>(p).is_ok_and(|p| p == *params) =>
+        {
             Some(*seq)
         }
         _ => None,
@@ -218,12 +223,27 @@ mod tests {
 
     #[test]
     fn menu_levels_and_item_letters_with_params() {
+        use serde_json::json;
         assert!(opens_menu("HB", "home.borders"));
+        // Prefixes that are not the Borders menu level don't open it.
         assert!(!opens_menu("H", "home.borders"), "the tab level shows the HB badge, not the menu");
         assert!(!opens_menu("", "home.borders"));
-        assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"all\"}"), Some("HBA"));
-        assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"bottom\"}"), Some("HBO"));
-        assert_eq!(item_letter_with("H", "home.borders", "{\"preset\":\"all\"}"), None);
+        assert!(!opens_menu("HBA", "home.borders"), "a finished sequence is not a menu level");
+        assert!(!opens_menu("HI", "home.borders"), "another group's level");
+        assert!(!opens_menu("HB", "home.fillColor"), "the Borders level is not another control's menu");
+        // Presets sharing home.borders are told apart by their params.
+        assert_eq!(item_letter_with("HB", "home.borders", &json!({"preset": "all"})), Some("HBA"));
+        assert_eq!(item_letter_with("HB", "home.borders", &json!({"preset": "bottom"})), Some("HBO"));
+        assert_eq!(item_letter_with("HB", "home.borders", &json!({"preset": "nope"})), None);
+        assert_eq!(item_letter_with("H", "home.borders", &json!({"preset": "all"})), None);
+        // Params compare as JSON values: key order and spacing don't matter.
+        let parsed: serde_json::Value = serde_json::from_str("{ \"preset\" : \"all\" }").unwrap();
+        assert_eq!(item_letter_with("HB", "home.borders", &parsed), Some("HBA"));
+        assert_eq!(
+            json!({"b": 1, "a": 2}),
+            serde_json::from_str::<serde_json::Value>("{\"a\":2,\"b\":1}").unwrap(),
+            "maps compare regardless of order"
+        );
         // Every preset in the Borders menu has its letter (Inside Borders is VSheet's own, J).
         for preset in [
             "bottom",
@@ -241,7 +261,7 @@ mod tests {
             "topDoubleBottom",
             "inside",
         ] {
-            assert!(item_letter_with("HB", "home.borders", &format!("{{\"preset\":\"{preset}\"}}")).is_some(), "{preset} has no letter");
+            assert!(item_letter_with("HB", "home.borders", &json!({"preset": preset})).is_some(), "{preset} has no letter");
         }
     }
 
