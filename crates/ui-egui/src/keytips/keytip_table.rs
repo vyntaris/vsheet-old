@@ -224,6 +224,25 @@ mod tests {
         assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"all\"}"), Some("HBA"));
         assert_eq!(item_letter_with("HB", "home.borders", "{\"preset\":\"bottom\"}"), Some("HBO"));
         assert_eq!(item_letter_with("H", "home.borders", "{\"preset\":\"all\"}"), None);
+        // Every preset in the Borders menu has its letter (Inside Borders is VSheet's own, J).
+        for preset in [
+            "bottom",
+            "top",
+            "left",
+            "right",
+            "none",
+            "all",
+            "outside",
+            "thickOutside",
+            "doubleBottom",
+            "thickBottom",
+            "topBottom",
+            "topThickBottom",
+            "topDoubleBottom",
+            "inside",
+        ] {
+            assert!(item_letter_with("HB", "home.borders", &format!("{{\"preset\":\"{preset}\"}}")).is_some(), "{preset} has no letter");
+        }
     }
 
     #[test]

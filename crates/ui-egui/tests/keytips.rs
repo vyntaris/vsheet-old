@@ -785,6 +785,15 @@ fn borders_keytip_opens_the_borders_menu() {
     assert_eq!(h.state().keytips.prefix(), None);
     assert!(sides(&h, "B2").iter().all(|s| *s != vsheet_engine::model::BorderStyle::None), "A applied All Borders");
 
+    // Inside Borders, VSheet's own item, has a letter too (J): only the inner edges.
+    let mut h = harness(selected("A1:B2"));
+    sequence(&mut h, &[Key::H, Key::B, Key::J], false);
+    h.run_steps(2);
+    let (a1, b2) = (sides(&h, "A1"), sides(&h, "B2"));
+    use vsheet_engine::model::BorderStyle::{None as N, Thin};
+    assert_eq!(a1, [N, Thin, N, Thin], "A1: right and bottom only");
+    assert_eq!(b2, [Thin, N, Thin, N], "B2: left and top only");
+
     let mut h = harness(blank());
     sequence(&mut h, &[Key::H, Key::B], false);
     h.run_steps(2);
