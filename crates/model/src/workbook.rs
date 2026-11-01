@@ -33,7 +33,8 @@ pub enum ShowObjects {
 /// The workbook window's display settings from `<workbookView>` (Excel: File › Options ›
 /// Advanced, "Display options for this workbook"): whether the window shows the sheet tabs
 /// and the two scroll bars, and how much of the horizontal bar the tabs take (`tabRatio`,
-/// thousandths of the bar; the format's default is 600).
+/// thousandths of the bar; the format's default is 600). XLSX I/O normalizes this
+/// share to 0–1000, including values supplied directly through the model.
 ///
 /// The values are modelled so an open + save keeps them — a workbook Excel saved with the
 /// tabs hidden must not come back with them shown and the settings gone. The app does not
@@ -66,6 +67,9 @@ impl Default for WorkbookView {
 }
 
 impl WorkbookView {
+    /// The entire bar, in thousandths: the upper bound used by XLSX I/O.
+    pub const MAX_TAB_RATIO: u32 = 1000;
+
     fn is_default(&self) -> bool {
         *self == WorkbookView::default()
     }

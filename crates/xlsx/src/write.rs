@@ -5,7 +5,7 @@ use std::fmt::Write as _;
 
 use vsheet_core::RangeRef;
 use vsheet_formula::quote_sheet;
-use vsheet_model::{CalcMode, CalcSettings, PhoneticString, ShowObjects, Style, Visibility, Workbook};
+use vsheet_model::{CalcMode, CalcSettings, PhoneticString, ShowObjects, Style, Visibility, Workbook, WorkbookView};
 
 use crate::package::ZipOut;
 use crate::xml::{esc, esc_attr};
@@ -223,8 +223,9 @@ fn workbook_view_attrs(wb: &Workbook) -> String {
     if !wb.view.show_vertical_scroll {
         attrs.push_str(" showVerticalScroll=\"0\"");
     }
-    if wb.view.tab_ratio != 600 {
-        let _ = write!(attrs, " tabRatio=\"{}\"", wb.view.tab_ratio);
+    let tab_ratio = wb.view.tab_ratio.min(WorkbookView::MAX_TAB_RATIO);
+    if tab_ratio != 600 {
+        let _ = write!(attrs, " tabRatio=\"{tab_ratio}\"");
     }
     attrs
 }

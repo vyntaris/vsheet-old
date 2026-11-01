@@ -2404,6 +2404,36 @@ fn deleting_a_3d_span_end_sheet_keeps_the_rest() {
 }
 
 #[test]
+fn workbook_view_roundtrips_after_sheet_deletion_and_reordering() {
+    let view = vsheet_model::WorkbookView { show_sheet_tabs: false, show_horizontal_scroll: true, show_vertical_scroll: false, tab_ratio: 350 };
+    for (initial_active, command, params, expected_order, expected_active) in [
+        ("Third", "home.deleteSheet", json!({"sheet": "First"}), vec!["Second", "Third"], 1),
+        ("Third", "home.deleteSheet", json!({"sheet": "Third"}), vec!["First", "Second"], 1),
+        ("First", "home.deleteSheet", json!({"sheet": "Third"}), vec!["First", "Second"], 0),
+        ("Third", "sheet.move", json!({"sheet": "Third", "to": 0}), vec!["Third", "First", "Second"], 0),
+        ("Third", "sheet.move", json!({"sheet": "First", "to": 2}), vec!["Second", "Third", "First"], 2),
+    ] {
+        let mut session = s();
+        session.execute("sheet.rename", json!({"name": "First"})).unwrap();
+        for name in ["Second", "Third"] {
+            session.execute("home.insertSheet", json!({"name": name})).unwrap();
+        }
+        std::sync::Arc::make_mut(&mut session.doc_mut().unwrap().wb).view = view;
+        session.execute("sheet.activate", json!({"sheet": initial_active})).unwrap();
+        session.execute(command, params).unwrap();
+
+        let wb = &session.doc().unwrap().wb;
+        assert_eq!(wb.active_sheet(), expected_active, "{command}");
+        assert_eq!(wb.sheets.iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), expected_order, "{command}");
+        let (back, _) = vsheet_xlsx::read_xlsx(&vsheet_xlsx::write_xlsx(wb).unwrap()).unwrap();
+        assert_eq!(back.sheets.iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), expected_order, "{command} after reopening");
+        assert_eq!(back.active_sheet(), expected_active, "activeTab follows {command}");
+        assert_eq!(back.active().unwrap().name, expected_order[expected_active], "the active sheet is not a stale index");
+        assert_eq!(back.view, view, "workbook display settings survive {command}");
+    }
+}
+
+#[test]
 fn xlsx_roundtrip_through_engine() {
     let mut s = s();
     s.execute("range.setValues", json!({"range": "A1", "values": [["a", 1], ["b", 2]]})).unwrap();

@@ -223,6 +223,13 @@ fn read_workbook_properties(cx: &mut Ctx<'_>, wb: &mut Workbook, xml: &El) {
     }
 }
 
+/// The single window modelled by VSheet: prefer the first visible window,
+/// including the format's default visibility, and otherwise retain the first one.
+fn selected_workbook_view(workbook: &El) -> Option<&El> {
+    let views = workbook.child("bookViews")?;
+    views.kids("workbookView").find(|view| view.attr("visibility").unwrap_or("visible") == "visible").or_else(|| views.child("workbookView"))
+}
+
 pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
     let pkg = Package::open(bytes)?;
     let mut cx = Ctx {
@@ -270,7 +277,7 @@ pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
     }
 
     read_workbook_properties(&mut cx, &mut wb, &wb_xml);
-    let view_el = wb_xml.path(&["bookViews", "workbookView"]);
+    let view_el = selected_workbook_view(&wb_xml);
     let active_tab = view_el.and_then(|v| v.attr_u32("activeTab")).unwrap_or(0) as usize;
     if let Some(v) = view_el {
         // The window's display settings (Excel's "Display options for this workbook").
@@ -280,7 +287,7 @@ pub fn read_xlsx(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
             show_sheet_tabs: v.flag("showSheetTabs", true),
             show_horizontal_scroll: v.flag("showHorizontalScroll", true),
             show_vertical_scroll: v.flag("showVerticalScroll", true),
-            tab_ratio: v.attr_u32("tabRatio").unwrap_or(600),
+            tab_ratio: v.attr_u32("tabRatio").unwrap_or(600).min(WorkbookView::MAX_TAB_RATIO),
         };
     }
 
