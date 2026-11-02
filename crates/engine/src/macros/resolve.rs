@@ -614,7 +614,10 @@ mod tests {
         let mut wb = wb();
         let sh = wb.sheet_mut(0).unwrap();
         let formula = Some(std::sync::Arc::new(vsheet_model::Formula::new("\"Amo\"&\"unt\"")));
-        sh.set_cell(CellRef::new(1, 2), vsheet_model::Cell { value: vsheet_core::Value::text("Amount"), formula, style: Default::default() });
+        sh.set_cell(
+            CellRef::new(1, 2),
+            vsheet_model::Cell { value: vsheet_core::Value::text("Amount"), formula, style: Default::default(), py: None },
+        );
         sh.show_formulas = true;
         let inputs = vec![("Input".to_string(), place("B2:D11"), true)];
         let env = Env { wb: &wb, active_sheet: 0, inputs: &inputs, output: None, item: None };
