@@ -5,6 +5,8 @@ use vsheet_model::{Anchor, Chart, ChartKind, Color, LegendPos, Series, Sparkline
 
 use crate::*;
 
+mod data_table;
+
 const ALL_KINDS: [ChartKind; 26] = [
     ChartKind::ColumnClustered,
     ChartKind::ColumnStacked,
@@ -43,6 +45,7 @@ fn chart(kind: ChartKind) -> Chart {
         series: vec![],
         legend: LegendPos::Bottom,
         data_labels: true,
+        data_table: None,
         gridlines: true,
         style: 0,
         x_title: Some("Quarter".into()),
