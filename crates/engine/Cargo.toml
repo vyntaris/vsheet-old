@@ -17,11 +17,13 @@ vsheet-model = { workspace = true }
 vsheet-calc = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+web-time = { workspace = true }
 thiserror = { workspace = true }
 log = { workspace = true }
 vsheet-xlsx = { workspace = true }
 vsheet-chart = { workspace = true }
 vsheet-pdf = { workspace = true }
+vsheet-math = { workspace = true }
 image = { workspace = true }
 
 [dev-dependencies]

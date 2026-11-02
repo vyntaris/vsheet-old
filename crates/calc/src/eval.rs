@@ -7,7 +7,7 @@
 use std::sync::Arc;
 
 use vsheet_core::{Array, CellError, CellRef, MAX_COLS, MAX_ROWS, RangeRef, Value, compare};
-use vsheet_formula::{BinOp, Expr, RefKind, Reference, SheetSel, StructItem, StructRef, UnOp};
+use vsheet_formula::{BinOp, Expr, Reference, SheetSel, StructItem, StructRef, UnOp};
 use vsheet_functions::{Arg, Ctx};
 use vsheet_model::Workbook;
 
