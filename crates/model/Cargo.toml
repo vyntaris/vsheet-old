@@ -12,8 +12,7 @@ workspace = true
 vsheet-core = { workspace = true }
 sha2 = { workspace = true }
 vsheet-formula = { workspace = true }
+vsheet-math = { workspace = true }
 serde = { workspace = true }
-thiserror = { workspace = true }
-
-[dev-dependencies]
 serde_json = { workspace = true }
+thiserror = { workspace = true }
