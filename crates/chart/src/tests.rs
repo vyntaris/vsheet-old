@@ -5,6 +5,7 @@ use vsheet_model::{Anchor, Chart, ChartKind, Color, LegendPos, Series, Sparkline
 
 use crate::*;
 
+mod budget;
 mod data_table;
 
 const ALL_KINDS: [ChartKind; 26] = [
