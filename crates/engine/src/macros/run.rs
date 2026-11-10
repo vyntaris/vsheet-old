@@ -335,7 +335,7 @@ fn check_input(wb: &Workbook, input: &vsheet_model::NamedInput, place: Place) ->
                 vsheet_model::ColType::Number => v.is_number(),
                 vsheet_model::ColType::Text => v.is_text(),
                 vsheet_model::ColType::Bool => matches!(v, Value::Bool(_)),
-                vsheet_model::ColType::Date => v.is_number() && crate::display::number_format(&date()).is_date(),
+                vsheet_model::ColType::Date => v.is_number() && crate::display::parsed(&date()).is_date(),
             };
             if !ok {
                 wrong.push((c, holds(&v, ty)));
