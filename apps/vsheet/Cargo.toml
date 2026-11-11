@@ -13,6 +13,7 @@ workspace = true
 [dependencies]
 vsheet-engine = { workspace = true }
 vsheet-ui-egui = { workspace = true }
+vsheet-sandbox = { workspace = true }
 eframe = { workspace = true, features = ["default_fonts", "wgpu", "accesskit", "wayland", "x11", "clipboard"] }
 egui = { workspace = true }
 serde_json = { workspace = true }
