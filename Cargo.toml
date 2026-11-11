@@ -14,6 +14,7 @@ repository = "https://github.com/storytold/gridcraft"
 # internal
 vsheet-core = { path = "crates/core" }
 vsheet-numfmt = { path = "crates/numfmt" }
+vsheet-sandbox = { path = "crates/sandbox" }
 vsheet-formula = { path = "crates/formula" }
 vsheet-functions = { path = "crates/functions" }
 vsheet-model = { path = "crates/model" }
