@@ -18,6 +18,7 @@ vsheet-core = { workspace = true }
 vsheet-formula = { workspace = true }
 vsheet-math = { workspace = true }
 vsheet-model = { workspace = true }
+craft-xls = { workspace = true }
 thiserror = { workspace = true }
 quick-xml = { workspace = true }
 zip = { workspace = true }
