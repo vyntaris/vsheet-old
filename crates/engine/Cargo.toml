@@ -21,6 +21,7 @@ web-time = { workspace = true }
 thiserror = { workspace = true }
 log = { workspace = true }
 vsheet-xlsx = { workspace = true }
+craft-csv = { workspace = true }
 vsheet-chart = { workspace = true }
 vsheet-pdf = { workspace = true }
 vsheet-math = { workspace = true }
