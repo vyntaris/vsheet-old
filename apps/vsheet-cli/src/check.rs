@@ -368,6 +368,8 @@ pub fn check_bytes(path: &str, bytes: &[u8], opts: &Options) -> FileReport {
 }
 
 fn check_inner(path: &str, bytes: &[u8], opts: &Options) -> FileReport {
+    // GETPIVOTDATA needs the engine's pivot indexer; without it every such cell reads #REF!.
+    let _ = vsheet_engine::model::PIVOT_INDEXER.set(vsheet_engine::pivot::index_cells);
     let mut report = FileReport { path: path.to_string(), ..Default::default() };
     let (cached, warnings) = match vsheet_engine::io::open_bytes(path, bytes) {
         Ok(x) => x,
