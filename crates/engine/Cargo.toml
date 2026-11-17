@@ -22,6 +22,7 @@ thiserror = { workspace = true }
 log = { workspace = true }
 vsheet-xlsx = { workspace = true }
 craft-csv = { workspace = true }
+craft-gridcraft-format = { workspace = true }
 vsheet-chart = { workspace = true }
 vsheet-pdf = { workspace = true }
 vsheet-math = { workspace = true }
