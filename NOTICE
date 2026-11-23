@@ -1,5 +1,16 @@
-VSheet
-Copyright (c) 2026 ArtCraft Team and the VSheet contributors.
+VSheet (Vyntaris Office)
+Copyright (c) 2026 Vyntaris, for the changes made for Vyntaris Office.
+
+VSheet is a modified version of GridCraft by the ArtCraft Team and contributors
+(https://github.com/storytold/gridcraft), under the same licence: the MIT License or the Apache
+License 2.0, at your option (LICENSE-MIT, LICENSE-APACHE). The changes are licensed the same way.
+GridCraft's name was replaced by VSheet throughout; VSheet does not use the ArtCraft name, wordmark or
+logos. Vyntaris's own part is shared/gtk-theme. GridCraft's own notice follows, unchanged.
+
+-------------------------------------------------------------------------------------------------
+
+GridCraft
+Copyright (c) 2026 ArtCraft Team and the GridCraft contributors.
 Licensed under the MIT License or the Apache License, Version 2.0, at your option
 (LICENSE-MIT, LICENSE-APACHE).
 
@@ -12,7 +23,7 @@ Third-party material
 This product bundles third-party material under its own licenses, listed below. The per-file
 list (author, source, license) is in ATTRIBUTION.md.
 
-VSheet's original assets and the UI's bundled egui font inputs are listed in ATTRIBUTION.md.
+GridCraft's original assets and the UI's bundled egui font inputs are listed in ATTRIBUTION.md.
 Builds made with craft-fonts (CRAFT_FONTS_DIR) also embed the fonts listed there under the SIL Open
 Font License 1.1.
 

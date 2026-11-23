@@ -10,10 +10,13 @@
 /// prompt shows both, and an AppImage's menu entry gets the icon.
 #[cfg(not(target_arch = "wasm32"))]
 pub const UPDATE_APP: craft_update::app::App = craft_update::app::App {
-    icon_png: Some(include_bytes!("../../../assets/app-icon/hicolor/128x128/apps/ai.storyteller.vsheet.png")),
+    icon_png: Some(include_bytes!("../../../assets/app-icon/hicolor/128x128/apps/org.vyntaris.VSheet.png")),
     accent: Some([0x1f, 0x9d, 0x55]),
-    ..craft_update::suite::VSHEET
+    ..craft_update::suite::GRIDCRAFT
 };
+
+/// The desktop's GTK theme, followed live (Vyntaris).
+pub use vyntaris_gtk_theme as gtk_theme;
 
 pub mod backstage;
 mod border_preview;
@@ -163,7 +166,8 @@ impl Default for UiState {
     fn default() -> Self {
         UiState {
             dark: false,
-            system_theme: false,
+            // Vyntaris: follows the desktop (its GTK theme) unless the user picks light or dark.
+            system_theme: true,
             ribbon_tab: "Home".into(),
             ribbon_collapsed: false,
             formula_bar_expanded: false,

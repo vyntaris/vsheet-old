@@ -236,7 +236,7 @@ fn icon() -> Option<egui::IconData> {
     #[cfg(target_os = "macos")]
     let bytes = include_bytes!("../../../assets/app-icon/vsheet-macos-512.png");
     #[cfg(not(target_os = "macos"))]
-    let bytes = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/ai.storyteller.vsheet.png");
+    let bytes = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/org.vyntaris.VSheet.png");
     let img = image::load_from_memory(bytes).ok()?.to_rgba8();
     Some(egui::IconData { width: img.width(), height: img.height(), rgba: img.into_raw() })
 }
@@ -348,7 +348,7 @@ fn main() -> eframe::Result<()> {
         .with_title("VSheet")
         .with_inner_size([1440.0, 900.0])
         .with_min_inner_size([640.0, 420.0])
-        .with_app_id("ai.storyteller.vsheet")
+        .with_app_id("org.vyntaris.VSheet")
         .with_drag_and_drop(true)
         .with_decorations(!app.window_controls);
     if cfg!(target_os = "macos") {
@@ -393,6 +393,9 @@ fn main() -> eframe::Result<()> {
                 let Some(mut app) = pending.take() else {
                     return Err("the app was already created".into());
                 };
+                // Vyntaris: the desktop's GTK theme, its colours followed live (`gtk_theme`).
+                vsheet_ui_egui::gtk_theme::enable(&cc.egui_ctx);
+                vsheet_ui_egui::theme::refresh_gtk();
                 SheetApp::setup_context_for_language(&cc.egui_ctx, app.ui.dark, app.ui.language);
                 if let Some(port) = control_port {
                     match control_server::start(port, control_token.clone(), cc.egui_ctx.clone()) {

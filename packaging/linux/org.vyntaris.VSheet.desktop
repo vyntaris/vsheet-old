@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+Name=VSheet
+GenericName=Spreadsheet
+GenericName[sr]=Табеле
+GenericName[sr@latin]=Tabele
+Comment=Calculate, chart and analyse data; open and save .xlsx, .ods and .csv
+Comment[sr]=Рачунајте, правите графиконе и анализирајте податке; отварајте и чувајте .xlsx, .ods и .csv
+Comment[sr@latin]=Računajte, pravite grafikone i analizirajte podatke; otvarajte i čuvajte .xlsx, .ods i .csv
+Exec=vsheet %F
+TryExec=vsheet
+Icon=org.vyntaris.VSheet
+Terminal=false
+StartupNotify=true
+StartupWMClass=org.vyntaris.VSheet
+Categories=Office;Spreadsheet;
+Keywords=spreadsheet;sheet;table;xlsx;csv;ods;calc;tabela;tabele;
+MimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.ms-excel.sheet.macroEnabled.12;application/vnd.ms-excel.sheet.binary.macroEnabled.12;application/vnd.oasis.opendocument.spreadsheet;text/csv;text/tab-separated-values;

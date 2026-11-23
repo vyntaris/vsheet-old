@@ -2266,258 +2266,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "vsheet"
-version = "0.19.1"
-dependencies = [
- "arboard",
- "chrono",
- "craft-print",
- "craft-update",
- "eframe",
- "egui",
- "fmv-macos-events",
- "getrandom 0.4.3",
- "vsheet-engine",
- "vsheet-mcp",
- "vsheet-sandbox",
- "vsheet-ui-egui",
- "image",
- "log",
- "muda",
- "objc2 0.6.5",
- "objc2-app-kit 0.3.2",
- "pollster 1.0.1",
- "rfd",
- "serde_json",
- "winit",
- "winresource",
-]
-
-[[package]]
-name = "vsheet-calc"
-version = "0.19.1"
-dependencies = [
- "vsheet-core",
- "vsheet-formula",
- "vsheet-functions",
- "vsheet-model",
- "vsheet-numfmt",
- "log",
-]
-
-[[package]]
-name = "vsheet-chart"
-version = "0.19.1"
-dependencies = [
- "vsheet-calc",
- "vsheet-core",
- "vsheet-model",
- "vsheet-numfmt",
- "serde",
-]
-
-[[package]]
-name = "vsheet-cli"
-version = "0.19.1"
-dependencies = [
- "vsheet-engine",
- "vsheet-mcp",
- "vsheet-sandbox",
- "log",
- "quick-xml 0.41.0",
- "serde_json",
- "zip 3.0.0",
-]
-
-[[package]]
-name = "vsheet-core"
-version = "0.19.1"
-dependencies = [
- "chrono",
- "js-sys",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "vsheet-engine"
-version = "0.19.1"
-dependencies = [
- "craft-csv",
- "craft-gridcraft-format",
- "vsheet-calc",
- "vsheet-chart",
- "vsheet-core",
- "vsheet-formula",
- "vsheet-functions",
- "vsheet-math",
- "vsheet-model",
- "vsheet-numfmt",
- "vsheet-pdf",
- "vsheet-xlsx",
- "image",
- "log",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "unicode-segmentation",
- "web-time",
- "zip 3.0.0",
-]
-
-[[package]]
-name = "vsheet-formula"
-version = "0.19.1"
-dependencies = [
- "vsheet-core",
- "serde",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "vsheet-functions"
-version = "0.19.1"
-dependencies = [
- "vsheet-core",
- "regex",
-]
-
-[[package]]
-name = "vsheet-math"
-version = "0.19.1"
-dependencies = [
- "ratex-font",
- "ratex-layout",
- "ratex-parser",
- "ratex-types",
-]
-
-[[package]]
-name = "vsheet-mcp"
-version = "0.19.1"
-dependencies = [
- "craft-mcp-server",
- "vsheet-engine",
- "log",
- "serde_json",
-]
-
-[[package]]
-name = "vsheet-model"
-version = "0.19.1"
-dependencies = [
- "vsheet-core",
- "vsheet-formula",
- "vsheet-math",
- "serde",
- "serde_json",
- "sha2 0.11.1",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "vsheet-numfmt"
-version = "0.19.1"
-dependencies = [
- "vsheet-core",
-]
-
-[[package]]
-name = "vsheet-pdf"
-version = "0.19.1"
-dependencies = [
- "craft-pdf",
- "craft-stream-codecs",
- "harfrust",
- "sha2 0.11.1",
- "skrifa",
- "unicode-bidi",
-]
-
-[[package]]
-name = "vsheet-sandbox"
-version = "0.19.1"
-dependencies = [
- "landlock",
- "libc",
- "nix",
- "seccompiler",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "vsheet-ui-egui"
-version = "0.19.1"
-dependencies = [
- "craft-ui",
- "craft-update",
- "craft-window",
- "egui",
- "egui_extras",
- "egui_kittest",
- "epaint_default_fonts",
- "vsheet-chart",
- "vsheet-engine",
- "vsheet-xlsx",
- "image",
- "log",
- "serde",
- "serde_json",
- "skrifa",
- "sys-locale",
- "toml",
- "unicode-bidi",
- "web-sys",
- "web-time",
- "zbus",
-]
-
-[[package]]
-name = "vsheet-web"
-version = "0.19.1"
-dependencies = [
- "craft-web-api",
- "craft-web-host",
- "eframe",
- "egui",
- "vsheet-engine",
- "vsheet-ui-egui",
- "js-sys",
- "log",
- "rfd",
- "serde_json",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "vsheet-xlsx"
-version = "0.19.1"
-dependencies = [
- "craft-cfb 0.1.0 (git+https://github.com/storytold/craft-libs?rev=e98299546f5c5c3c22388d16507f8b5e61a5f280)",
- "craft-csv",
- "craft-drawingml",
- "craft-math",
- "craft-ods",
- "craft-offcrypto",
- "craft-opc",
- "craft-xls",
- "craft-xlsx",
- "craft-xml 0.1.0 (git+https://github.com/storytold/craft-libs?rev=a20dfd1623709b0bd9830106d3a92a1a443902e3)",
- "vsheet-core",
- "vsheet-formula",
- "vsheet-functions",
- "vsheet-math",
- "vsheet-model",
- "quick-xml 0.41.0",
- "sha2 0.11.1",
- "thiserror 2.0.21",
- "zip 3.0.0",
-]
-
-[[package]]
 name = "guillotiere"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6091,6 +5839,267 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "vsheet"
+version = "0.19.1"
+dependencies = [
+ "arboard",
+ "chrono",
+ "craft-print",
+ "craft-update",
+ "eframe",
+ "egui",
+ "fmv-macos-events",
+ "getrandom 0.4.3",
+ "image",
+ "log",
+ "muda",
+ "objc2 0.6.5",
+ "objc2-app-kit 0.3.2",
+ "pollster 1.0.1",
+ "rfd",
+ "serde_json",
+ "vsheet-engine",
+ "vsheet-mcp",
+ "vsheet-sandbox",
+ "vsheet-ui-egui",
+ "winit",
+ "winresource",
+]
+
+[[package]]
+name = "vsheet-calc"
+version = "0.19.1"
+dependencies = [
+ "log",
+ "vsheet-core",
+ "vsheet-formula",
+ "vsheet-functions",
+ "vsheet-model",
+ "vsheet-numfmt",
+]
+
+[[package]]
+name = "vsheet-chart"
+version = "0.19.1"
+dependencies = [
+ "serde",
+ "vsheet-calc",
+ "vsheet-core",
+ "vsheet-model",
+ "vsheet-numfmt",
+]
+
+[[package]]
+name = "vsheet-cli"
+version = "0.19.1"
+dependencies = [
+ "log",
+ "quick-xml 0.41.0",
+ "serde_json",
+ "vsheet-engine",
+ "vsheet-mcp",
+ "vsheet-sandbox",
+ "zip 3.0.0",
+]
+
+[[package]]
+name = "vsheet-core"
+version = "0.19.1"
+dependencies = [
+ "chrono",
+ "js-sys",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "vsheet-engine"
+version = "0.19.1"
+dependencies = [
+ "craft-csv",
+ "craft-gridcraft-format",
+ "image",
+ "log",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "unicode-segmentation",
+ "vsheet-calc",
+ "vsheet-chart",
+ "vsheet-core",
+ "vsheet-formula",
+ "vsheet-functions",
+ "vsheet-math",
+ "vsheet-model",
+ "vsheet-numfmt",
+ "vsheet-pdf",
+ "vsheet-xlsx",
+ "web-time",
+ "zip 3.0.0",
+]
+
+[[package]]
+name = "vsheet-formula"
+version = "0.19.1"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+ "vsheet-core",
+]
+
+[[package]]
+name = "vsheet-functions"
+version = "0.19.1"
+dependencies = [
+ "regex",
+ "vsheet-core",
+]
+
+[[package]]
+name = "vsheet-math"
+version = "0.19.1"
+dependencies = [
+ "ratex-font",
+ "ratex-layout",
+ "ratex-parser",
+ "ratex-types",
+]
+
+[[package]]
+name = "vsheet-mcp"
+version = "0.19.1"
+dependencies = [
+ "craft-mcp-server",
+ "log",
+ "serde_json",
+ "vsheet-engine",
+]
+
+[[package]]
+name = "vsheet-model"
+version = "0.19.1"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+ "vsheet-core",
+ "vsheet-formula",
+ "vsheet-math",
+]
+
+[[package]]
+name = "vsheet-numfmt"
+version = "0.19.1"
+dependencies = [
+ "vsheet-core",
+]
+
+[[package]]
+name = "vsheet-pdf"
+version = "0.19.1"
+dependencies = [
+ "craft-pdf",
+ "craft-stream-codecs",
+ "harfrust",
+ "sha2 0.11.1",
+ "skrifa",
+ "unicode-bidi",
+]
+
+[[package]]
+name = "vsheet-sandbox"
+version = "0.19.1"
+dependencies = [
+ "landlock",
+ "libc",
+ "nix",
+ "seccompiler",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "vsheet-ui-egui"
+version = "0.19.1"
+dependencies = [
+ "craft-ui",
+ "craft-update",
+ "craft-window",
+ "egui",
+ "egui_extras",
+ "egui_kittest",
+ "epaint_default_fonts",
+ "image",
+ "log",
+ "serde",
+ "serde_json",
+ "skrifa",
+ "sys-locale",
+ "toml",
+ "unicode-bidi",
+ "vsheet-chart",
+ "vsheet-engine",
+ "vsheet-xlsx",
+ "vyntaris-gtk-theme",
+ "web-sys",
+ "web-time",
+ "zbus",
+]
+
+[[package]]
+name = "vsheet-web"
+version = "0.19.1"
+dependencies = [
+ "craft-web-api",
+ "craft-web-host",
+ "eframe",
+ "egui",
+ "js-sys",
+ "log",
+ "rfd",
+ "serde_json",
+ "vsheet-engine",
+ "vsheet-ui-egui",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "vsheet-xlsx"
+version = "0.19.1"
+dependencies = [
+ "craft-cfb 0.1.0 (git+https://github.com/storytold/craft-libs?rev=e98299546f5c5c3c22388d16507f8b5e61a5f280)",
+ "craft-csv",
+ "craft-drawingml",
+ "craft-math",
+ "craft-ods",
+ "craft-offcrypto",
+ "craft-opc",
+ "craft-xls",
+ "craft-xlsx",
+ "craft-xml 0.1.0 (git+https://github.com/storytold/craft-libs?rev=a20dfd1623709b0bd9830106d3a92a1a443902e3)",
+ "quick-xml 0.41.0",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+ "vsheet-core",
+ "vsheet-formula",
+ "vsheet-functions",
+ "vsheet-math",
+ "vsheet-model",
+ "zip 3.0.0",
+]
+
+[[package]]
+name = "vyntaris-gtk-theme"
+version = "0.19.1"
+dependencies = [
+ "egui",
+ "log",
+]
+
+[[package]]
 name = "walkdir"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7009,8 +7018,8 @@ checksum = "e450f9b2ed1dff33c94c12589a87338689467b9c4f5d8a5710bd09a847d2c8a7"
 name = "xtask"
 version = "0.19.1"
 dependencies = [
- "vsheet-engine",
  "serde_json",
+ "vsheet-engine",
 ]
 
 [[package]]

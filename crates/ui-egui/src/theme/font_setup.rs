@@ -299,6 +299,13 @@ pub(super) fn candidates(role: &str) -> Vec<(String, u32)> {
     let lin = ["/usr/share/fonts/truetype", "/usr/share/fonts", "/usr/local/share/fonts", "/usr/share/fonts/TTF", "/usr/share/fonts/chromeos"];
     let mut v: Vec<(String, u32)> = Vec::new();
     let mut add = |s: String, i: u32| v.push((s, i));
+    // Vyntaris: the desktop's interface font (GTK's) first.
+    if matches!(role, "ui" | "ui-bold")
+        && crate::gtk_theme::enabled()
+        && let Some((file, index)) = gtk_font_family().and_then(|f| fc_match(&if role == "ui-bold" { format!("{f}:bold") } else { f }))
+    {
+        add(file, index);
+    }
     match role {
         "ui" => {
             add(format!("{mac_sys}/SFNS.ttf"), 0);
@@ -692,4 +699,28 @@ mod font_binding_tests {
             assert!(crate::fonts::is_bound(&fam), "{name:?} → unbound {fam:?}");
         }
     }
+}
+
+/// The font file fontconfig picks for a pattern (`Inter`, `Inter:bold`), and the face's index in it.
+fn fc_match(pattern: &str) -> Option<(String, u32)> {
+    let out = std::process::Command::new("fc-match").args(["-f", "%{file}\t%{index}", pattern]).output().ok()?;
+    let text = String::from_utf8(out.stdout).ok()?;
+    let (path, index) = text.split_once('\t')?;
+    (out.status.success() && !path.is_empty()).then(|| (path.to_string(), index.trim().parse().unwrap_or(0)))
+}
+
+/// The desktop's interface font family, as GTK names it (`gtk-font-name=Inter 10`).
+fn gtk_font_family() -> Option<String> {
+    let config = std::env::var_os("XDG_CONFIG_HOME")
+        .map(std::path::PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config")))?;
+    ["gtk-4.0/settings.ini", "gtk-3.0/settings.ini"].iter().find_map(|f| {
+        let text = std::fs::read_to_string(config.join(f)).ok()?;
+        let value = text.lines().find_map(|l| l.trim().strip_prefix("gtk-font-name="))?.trim();
+        let family: Vec<&str> = value
+            .split_whitespace()
+            .take_while(|w| w.parse::<f32>().is_err() && !matches!(*w, "Bold" | "Italic" | "Regular" | "Medium" | "Light" | "Semi-Bold"))
+            .collect();
+        (!family.is_empty()).then(|| family.join(" "))
+    })
 }

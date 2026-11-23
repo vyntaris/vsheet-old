@@ -122,6 +122,12 @@ impl SheetApp {
         if let Some(answer) = self.desktop_theme.take_change() {
             self.desktop_dark = Some(answer);
         }
+        // Vyntaris: the GTK theme changed (the app follows it, `gtk_theme`): its palette goes in again.
+        if crate::gtk_theme::take_changed() {
+            theme::refresh_gtk();
+            theme::apply(ctx, self.ui.dark);
+            ctx.request_repaint();
+        }
         self.sync_theme_preference(ctx);
         self.sync_input_options(ctx);
         // The geometry captures are bound to. Native frames recorded it from their fresh

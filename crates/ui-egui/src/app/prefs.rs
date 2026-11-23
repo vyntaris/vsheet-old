@@ -14,7 +14,11 @@ impl SheetApp {
     pub(super) fn sync_theme_preference(&mut self, ctx: &egui::Context) {
         let preference = match (
             self.ui.system_theme,
-            ctx.system_theme().or_else(|| self.desktop_dark.map(|d| if d { egui::Theme::Dark } else { egui::Theme::Light })),
+            // Vyntaris: the GTK theme's darkness first, then the system's and the desktop portal's.
+            crate::theme::gtk_dark()
+                .or(self.desktop_dark)
+                .map(|d| if d { egui::Theme::Dark } else { egui::Theme::Light })
+                .or_else(|| ctx.system_theme()),
         ) {
             (true, Some(egui::Theme::Dark)) => egui::ThemePreference::Dark,
             (true, Some(egui::Theme::Light)) => egui::ThemePreference::Light,

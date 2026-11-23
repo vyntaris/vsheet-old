@@ -13,6 +13,7 @@ workspace = true
 # craft-libs dependency uses (see the root Cargo.toml).
 craft-ui = { git = "https://github.com/storytold/craft-libs", rev = "aa84415bae3b765fef6b7ef42404f66ad1cff9d9" }
 vsheet-engine = { workspace = true }
+vyntaris-gtk-theme = { workspace = true }
 vsheet-chart = { workspace = true }
 # `monochrome_emoji_fonts` restores the Noto Emoji and emoji-icon faces that 0.37 moved behind
 # this feature. The UI draws ✕, ◀, ↘ and 📋 as text; without these faces the strict kittest

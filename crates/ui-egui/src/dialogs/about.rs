@@ -18,9 +18,9 @@ pub(super) fn about(ui: &mut egui::Ui, d: &mut Dialog) {
             ui.heading("VSheet");
             ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
             ui.add_space(4.0);
-            ui.label("A clean-room, open-source, Rust-native spreadsheet. Part of ArtCraft.");
-            ui.hyperlink_to("getartcraft.com/apps/vsheet", "https://getartcraft.com/apps/vsheet");
-            ui.hyperlink_to("Join the ArtCraft Discord", "https://discord.gg/artcraft");
+            ui.label("The spreadsheet of Vyntaris Office, based on GridCraft by the ArtCraft Team.");
+            ui.hyperlink_to("github.com/vyntaris/vsheet", "https://github.com/vyntaris/vsheet");
+            ui.hyperlink_to("GridCraft", "https://github.com/storytold/gridcraft");
         }
     }
 }

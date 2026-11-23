@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.vyntaris.VSheet</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <name>VSheet</name>
+  <summary>The spreadsheet of Vyntaris Office</summary>
+  <developer id="org.vyntaris">
+    <name>Vyntaris</name>
+  </developer>
+  <description>
+    <p>
+      VSheet calculates with formulas and functions, sorts, filters, pivots and charts data, and
+      opens and saves .xlsx, .ods, .csv and HTML. It wears the desktop's GTK theme.
+    </p>
+  </description>
+  <launchable type="desktop-id">org.vyntaris.VSheet.desktop</launchable>
+  <icon type="stock">org.vyntaris.VSheet</icon>
+  <categories>
+    <category>Office</category>
+    <category>Spreadsheet</category>
+  </categories>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+  <provides>
+    <binary>vsheet</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>

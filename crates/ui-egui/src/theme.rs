@@ -297,7 +297,64 @@ impl Tokens {
     }
 
     pub fn get(ctx: &egui::Context) -> Tokens {
-        if ctx.global_style().visuals.dark_mode { Tokens::dark() } else { Tokens::light() }
+        palette(ctx.global_style().visuals.dark_mode)
+    }
+
+    /// Vyntaris: the palette from a GTK theme's colours, laid over the built-in palette of the
+    /// same darkness for anything it doesn't name. The grid stays white paper with black text, as
+    /// printed.
+    pub fn from_gtk(g: &crate::gtk_theme::GtkColors) -> Option<Tokens> {
+        let dark = g.dark()?;
+        let mut t = if dark { Tokens::dark() } else { Tokens::light() };
+        let bg = g.get("window_bg_color")?;
+        let fg = g.get("window_fg_color").unwrap_or(t.text);
+        let mix = |a: Color32, b: Color32, f: f32| {
+            let m = |x: u8, y: u8| (f32::from(x) + (f32::from(y) - f32::from(x)) * f).round() as u8;
+            Color32::from_rgb(m(a.r(), b.r()), m(a.g(), b.g()), m(a.b(), b.b()))
+        };
+        let head = g.get("headerbar_bg_color").unwrap_or(bg);
+        let view = g.get("view_bg_color").unwrap_or(bg);
+        let card = g.get("card_bg_color").filter(|c| c.a() == 255).unwrap_or_else(|| mix(bg, fg, 0.08));
+        let border = g.get("headerbar_border_color").filter(|c| c.a() == 255).unwrap_or_else(|| mix(bg, fg, 0.12));
+        let accent = g.get("accent_bg_color").or_else(|| g.get("accent_color")).unwrap_or(t.accent);
+        // On the white grid a light accent shows too faintly: a deeper shade of it marks the selection.
+        let deep = mix(accent, Color32::BLACK, 0.3);
+        t.window = head;
+        t.ribbon = bg;
+        t.ribbon_border = border;
+        t.text = fg;
+        t.text_dim = mix(fg, bg, 0.3);
+        t.text_disabled = mix(fg, bg, 0.6);
+        t.accent = accent;
+        t.accent_dark = deep;
+        t.accent_soft = mix(bg, accent, 0.25);
+        t.on_accent = g.get("accent_fg_color").unwrap_or(t.on_accent);
+        t.hover = mix(bg, fg, 0.08);
+        t.pressed = mix(bg, fg, 0.15);
+        t.separator = border;
+        t.header_bg = head;
+        t.header_text = t.text_dim;
+        t.header_line = border;
+        t.header_sel_bg = mix(bg, accent, 0.22);
+        t.header_sel_text = accent;
+        t.header_all_bg = mix(bg, accent, 0.35);
+        t.sel_fill = Color32::from_rgba_unmultiplied(deep.r(), deep.g(), deep.b(), 0x24);
+        t.sel_border = deep;
+        t.input_bg = if dark { card } else { view };
+        t.input_border = mix(bg, fg, 0.22);
+        t.tab_bar = head;
+        t.tab_active = bg;
+        t.status_bar = head;
+        t.menu_bg = g.get("popover_bg_color").unwrap_or(head);
+        t.danger = g.get("destructive_bg_color").or_else(|| g.get("error_color")).unwrap_or(t.danger);
+        // The icons' colours: Catppuccin's, Mocha's on a dark interface and Latte's on a light one.
+        let hex = |v: u32| Color32::from_rgb((v >> 16) as u8, (v >> 8) as u8, v as u8);
+        t.cat = if dark {
+            [0x89B4FA, 0xA6E3A1, 0xFAB387, 0xF38BA8, 0xCBA6F7, 0x94E2D5, 0xF9E2AF, 0x9399B2].map(hex)
+        } else {
+            [0x1E66F5, 0x40A02B, 0xFE640B, 0xD20F39, 0x8839EF, 0x179299, 0xDF8E1D, 0x7C7F93].map(hex)
+        };
+        Some(t)
     }
 
     /// One colour of the category palette.
@@ -332,7 +389,7 @@ pub fn apply(ctx: &egui::Context, dark: bool) {
     // Install both palettes before System can switch between the style slots.
     for theme in [egui::Theme::Light, egui::Theme::Dark] {
         let dark = theme == egui::Theme::Dark;
-        let t = if dark { Tokens::dark() } else { Tokens::light() };
+        let t = palette(dark);
         let mut v = if dark { Visuals::dark() } else { Visuals::light() };
         v.panel_fill = t.window;
         v.window_fill = t.menu_bg;
@@ -514,3 +571,29 @@ mod contrast_tests {
 
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod tests;
+
+/// The GTK theme's palette, when it's followed and names its colours ([`refresh_gtk`]).
+static GTK_TOKENS: std::sync::RwLock<Option<Tokens>> = std::sync::RwLock::new(None);
+
+/// Vyntaris: read the followed GTK theme's colours again (after [`crate::gtk_theme`] saw them change).
+pub fn refresh_gtk() {
+    let tokens = crate::gtk_theme::current().as_ref().and_then(Tokens::from_gtk);
+    if let Ok(mut t) = GTK_TOKENS.write() {
+        *t = tokens;
+    }
+}
+
+/// Whether the followed GTK theme is dark (`None`: no GTK theme followed).
+pub fn gtk_dark() -> Option<bool> {
+    GTK_TOKENS.read().ok()?.as_ref().map(|t| t.dark)
+}
+
+/// The palette for a light or dark interface: the GTK theme's when it's followed and of that
+/// darkness, else the built-in one.
+pub fn palette(dark: bool) -> Tokens {
+    match GTK_TOKENS.read().ok().and_then(|t| t.clone()) {
+        Some(t) if t.dark == dark => t,
+        _ if dark => Tokens::dark(),
+        _ => Tokens::light(),
+    }
+}

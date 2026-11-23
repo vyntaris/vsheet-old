@@ -24,11 +24,10 @@ impl Default for Runtime {
 }
 
 /// Ask for a check; the next frame's `tick` starts it. A manual one reports every outcome.
+/// Vyntaris updates VSheet with the rest of the system (pacman), so the app never checks itself.
 pub(crate) fn start(app: &mut SheetApp, manual: bool) {
     if manual {
-        app.updates_rt.manual = true;
-    } else {
-        app.updates_rt.startup = true;
+        app.message = Some(("VSheet".into(), "VSheet is updated with the system: sudo pacman -Syu".into()));
     }
 }
 
